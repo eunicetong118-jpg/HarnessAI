@@ -30,7 +30,7 @@
   4. User can submit an MT5 account linkage request with IB mapping
 **Plans**: 4 plans
 Plans:
-- [ ] 02-01-PLAN.md — Config & Mocking
+- [x] 02-01-PLAN.md — Config & Mocking
 - [ ] 02-02-PLAN.md — Onboarding workflow
 - [ ] 02-03-PLAN.md — Dashboard UI & Charts
 - [ ] 02-04-PLAN.md — Guards & Polish
@@ -72,7 +72,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Auth & Verification | 3/3 | Completed | 2026-04-30 |
-| 2. Dashboard & Onboarding | 0/4 | In Progress | - |
+| 2. Dashboard & Onboarding | 1/4 | In Progress | - |
 | 3. Rebate Engine | 0/0 | Not started | - |
 | 4. Admin & Financials | 0/0 | Not started | - |
 | 5. Advanced Security | 0/0 | Not started | - |
