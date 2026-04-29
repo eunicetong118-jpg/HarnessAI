@@ -11,7 +11,7 @@
 - Every ingest must update `index.md` and `log.md`.
 - Interlink pages heavily.
 - Maintain entity pages, concept pages, and synthesis pages.
-- **Do not create sub-folders for project code. Use the root directory.**
+- **Do not create a project-level sub-folder (e.g. `rebate-portal/`). Keep the project files at the root of the repository.**
 
 ## Workflows
 
