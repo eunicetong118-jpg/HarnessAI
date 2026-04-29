@@ -1,3 +1,8 @@
+# Clean Code Principles
+- Follow clean code principles (DRY, KISS, SOLID).
+- Strictly follow `raw/Cashback website requirement` for instructions and folder structure.
+- Present alternative proposals for decision before implementation.
+
 # LLM Wiki Schema (Karpathy Methodology)
 
 ## Structure
