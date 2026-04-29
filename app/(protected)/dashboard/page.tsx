@@ -3,6 +3,7 @@ import { getBalance } from '@/services/ledger.service';
 import { getMockChartData } from '@/lib/mock-data';
 import { StatsCards } from '@/components/dashboard/StatsCards';
 import { RebateChart } from '@/components/dashboard/RebateChart';
+import { MilestoneTrigger } from '@/components/dashboard/milestone-trigger';
 
 export default async function DashboardPage() {
   const session = await auth();
@@ -16,6 +17,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="max-w-7xl mx-auto space-y-8">
+      <MilestoneTrigger totalEarned={balance.totalEarned} />
       <div>
         <h2 className="text-2xl font-bold text-gray-900">Dashboard</h2>
         <p className="text-sm text-gray-500">
