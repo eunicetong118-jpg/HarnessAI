@@ -76,6 +76,18 @@ export async function hasLinkedAccount(userId: string) {
 }
 
 /**
+ * Gets all broker accounts for a user.
+ *
+ * @param userId - The ID of the user to check
+ * @returns Array of broker accounts
+ */
+export async function getBrokerAccounts(userId: string) {
+  return await prisma.brokerAccount.findMany({
+    where: { userId },
+  });
+}
+
+/**
  * Gets the IB URL and name for a given country code.
  *
  * @param countryCode - The country code to look up

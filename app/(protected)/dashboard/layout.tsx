@@ -1,7 +1,8 @@
 import { redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
-import { hasLinkedAccount } from '@/services/broker.service';
+import { hasLinkedAccount, getBrokerAccounts } from '@/services/broker.service';
 import { Sidebar } from '@/components/dashboard/Sidebar';
+import { PendingBanner } from '@/components/dashboard/pending-banner';
 
 export default async function DashboardLayout({
   children,
@@ -15,11 +16,13 @@ export default async function DashboardLayout({
   }
 
   const userId = (session.user as any).id;
-  const linked = await hasLinkedAccount(userId);
+  const accounts = await getBrokerAccounts(userId);
 
-  if (!linked) {
+  if (accounts.length === 0) {
     redirect('/onboarding');
   }
+
+  const hasPending = accounts.some(acc => acc.status === 'PENDING');
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -38,6 +41,7 @@ export default async function DashboardLayout({
           </div>
         </header>
         <main className="flex-1 overflow-y-auto p-6 bg-gray-50">
+          {hasPending && <PendingBanner />}
           {children}
         </main>
       </div>
