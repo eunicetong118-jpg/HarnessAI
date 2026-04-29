@@ -28,3 +28,11 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+/src/generated/prisma
+.worktrees/
+.agents/
+.claude/
+.env
+venv/
+venv311/
+node_modules/
