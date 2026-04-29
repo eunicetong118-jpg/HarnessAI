@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-last_updated: "2026-04-29T17:55:03.430Z"
+last_updated: "2026-04-29T18:03:27.732Z"
 progress:
   total_phases: 5
   completed_phases: 0
   total_plans: 7
-  completed_plans: 2
-  percent: 29
+  completed_plans: 3
+  percent: 43
 ---
 
 # State
@@ -25,7 +25,7 @@ progress:
 Phase: 02-dashboard-onboarding
 Plan: 02
 Status: Completed
-Progress: [███░░░░░░░] 29%
+Progress: [████░░░░░░] 43%
 
 ## Performance Metrics
 
@@ -53,6 +53,8 @@ Progress: [███░░░░░░░] 29%
 - NextAuth v5 (Beta) used for authentication.
 - Layered service pattern isolates business logic from route handlers.
 - Using BigInt (cents) for reward milestones and ledger entries to ensure financial precision.
+- Using LedgerService for balance aggregation via Prisma group-by.
+- Replaced bcrypt with bcryptjs to resolve Next.js build issues.
 
 ### Todos
 
