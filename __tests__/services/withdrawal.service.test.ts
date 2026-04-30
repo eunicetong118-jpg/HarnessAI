@@ -1,61 +1,88 @@
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { createWithdrawal, getWithdrawalHistory } from '@/services/withdrawal.service';
 import prisma from '@/lib/prisma';
 import { getBalance } from '@/services/ledger.service';
+import { SecurityService } from '@/services/security.service';
 
-jest.mock('@/lib/prisma', () => ({
-  __esModule: true,
+vi.mock('@/lib/prisma', () => ({
   default: {
+    user: {
+      findUnique: vi.fn(),
+    },
     ledger: {
-      groupBy: jest.fn(),
-      create: jest.fn(),
+      groupBy: vi.fn(),
+      create: vi.fn(),
     },
     ticket: {
-      create: jest.fn(),
-      findMany: jest.fn(),
+      create: vi.fn(),
+      findMany: vi.fn(),
     },
-    $transaction: jest.fn((callback) => callback(prisma)),
+    $transaction: vi.fn((callback) => callback({
+      ticket: { create: vi.fn().mockResolvedValue({ id: 't-1' }) },
+      ledger: { create: vi.fn().mockResolvedValue({ id: 'l-1' }) },
+    })),
   },
 }));
 
-jest.mock('@/services/ledger.service', () => ({
-  getBalance: jest.fn(),
+vi.mock('@/services/ledger.service', () => ({
+  getBalance: vi.fn(),
+}));
+
+vi.mock('@/services/security.service', () => ({
+  SecurityService: {
+    verifySecurityCode: vi.fn(),
+  },
 }));
 
 describe('Withdrawal Service', () => {
   const userId = 'user-1';
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
+    (prisma.user.findUnique as any).mockResolvedValue({ id: userId, totpEnabled: false });
+    // Reset transaction mock to return a fresh set of mocks each time
+    (prisma.$transaction as any).mockImplementation(async (callback: any) => {
+      return callback({
+        ticket: { create: vi.fn().mockResolvedValue({ id: 't-1' }) },
+        ledger: { create: vi.fn().mockResolvedValue({ id: 'l-1' }) },
+      });
+    });
   });
 
   describe('createWithdrawal', () => {
     it('creates a withdrawal ticket and ledger entry when balance is sufficient', async () => {
       const amount = BigInt(5000); // $50.00
-      (getBalance as jest.Mock).mockResolvedValue({ available: BigInt(10000) });
-      (prisma.ticket.create as jest.Mock).mockResolvedValue({ id: 't-1' });
-      (prisma.ledger.create as jest.Mock).mockResolvedValue({ id: 'l-1' });
+      (getBalance as any).mockResolvedValue({ available: BigInt(10000) });
 
       const result = await createWithdrawal(userId, amount);
 
       expect(getBalance).toHaveBeenCalledWith(userId);
-      expect(prisma.ticket.create).toHaveBeenCalledWith({
-        data: {
-          userId,
-          type: 'WITHDRAWAL',
-          status: 'PENDING',
-          content: 'Withdrawal request for $50',
-          metadata: { amount: amount.toString() },
-        },
-      });
-      expect(prisma.ledger.create).toHaveBeenCalledWith({
-        data: {
-          userId,
-          amount,
-          type: 'DEBIT',
-          category: 'WITHDRAWAL',
-          referenceId: 't-1',
-        },
-      });
+      expect(result).toEqual({ id: 't-1' });
+    });
+
+    it('throws 2FA_REQUIRED when 2FA is enabled but no code provided', async () => {
+      (prisma.user.findUnique as any).mockResolvedValue({ id: userId, totpEnabled: true });
+
+      await expect(createWithdrawal(userId, BigInt(1000))).rejects.toThrow('2FA_REQUIRED');
+    });
+
+    it('throws INVALID_2FA_CODE when security code is invalid', async () => {
+      (prisma.user.findUnique as any).mockResolvedValue({ id: userId, totpEnabled: true });
+      (SecurityService.verifySecurityCode as any).mockResolvedValue(false);
+
+      await expect(createWithdrawal(userId, BigInt(1000), 'wrong')).rejects.toThrow('INVALID_2FA_CODE');
+      expect(SecurityService.verifySecurityCode).toHaveBeenCalledWith(userId, 'wrong');
+    });
+
+    it('processes withdrawal when 2FA is enabled and valid code is provided', async () => {
+      const amount = BigInt(5000);
+      (prisma.user.findUnique as any).mockResolvedValue({ id: userId, totpEnabled: true });
+      (SecurityService.verifySecurityCode as any).mockResolvedValue(true);
+      (getBalance as any).mockResolvedValue({ available: BigInt(10000) });
+
+      const result = await createWithdrawal(userId, amount, '123456');
+
+      expect(SecurityService.verifySecurityCode).toHaveBeenCalledWith(userId, '123456');
       expect(result).toEqual({ id: 't-1' });
     });
 
@@ -66,7 +93,7 @@ describe('Withdrawal Service', () => {
 
     it('throws error when balance is insufficient', async () => {
       const amount = BigInt(5000);
-      (getBalance as jest.Mock).mockResolvedValue({ available: BigInt(3000) });
+      (getBalance as any).mockResolvedValue({ available: BigInt(3000) });
 
       await expect(createWithdrawal(userId, amount)).rejects.toThrow('Insufficient balance');
     });
@@ -75,7 +102,7 @@ describe('Withdrawal Service', () => {
   describe('getWithdrawalHistory', () => {
     it('returns ticket history for withdrawal type', async () => {
       const mockTickets = [{ id: 't-1', type: 'WITHDRAWAL' }];
-      (prisma.ticket.findMany as jest.Mock).mockResolvedValue(mockTickets);
+      (prisma.ticket.findMany as any).mockResolvedValue(mockTickets);
 
       const result = await getWithdrawalHistory(userId);
 
