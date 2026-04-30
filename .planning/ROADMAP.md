@@ -2,8 +2,8 @@
 
 ## Phases
 - [x] **Phase 1: Auth & Verification** - End-to-end secure registration and login
-- [ ] **Phase 2: Dashboard & Onboarding** - MT5 linkage and user dashboard visualization
-- [ ] **Phase 3: Rebate Engine** - Automated trade processing and calculation
+- [x] **Phase 2: Dashboard & Onboarding** - MT5 linkage and user dashboard visualization
+- [x] **Phase 3: Rebate Engine** - Automated trade processing and calculation
 - [ ] **Phase 4: Admin & Financials** - Withdrawal tickets and admin command center
 - [ ] **Phase 5: Advanced Security** - TOTP 2FA and security audits
 
@@ -28,12 +28,7 @@
   2. User can see Ledger summary cards (Total Earned, Available, Pending)
   3. User sees an amber pending banner if their account is unverified
   4. User can submit an MT5 account linkage request with IB mapping
-**Plans**: 4 plans
-Plans:
-- [x] 02-01-PLAN.md — Config & Mocking
-- [x] 02-02-PLAN.md — Onboarding workflow
-- [ ] 02-03-PLAN.md — Dashboard UI & Charts
-- [ ] 02-04-PLAN.md — Guards & Polish
+**Plans**: Completed
 **UI hint**: yes
 
 ### Phase 3: Rebate Engine
@@ -44,11 +39,7 @@ Plans:
   1. System can ingest CSV/Excel trade logs
   2. System correctly calculates rebates using the 80% formula
   3. Ledger credits are aggregated without duplication
-**Plans**: 3 plans
-Plans:
-- [ ] 03-01-PLAN.md — Trade Model & Ingestion
-- [ ] 03-02-PLAN.md — Calculation & Aggregation
-- [ ] 03-03-PLAN.md — Cron & Admin API
+**Plans**: Completed
 
 ### Phase 4: Admin & Financials
 **Goal**: Secure fund payouts and admin management.
@@ -58,7 +49,11 @@ Plans:
   1. User can request a withdrawal via a ticket system
   2. Admin can process verification and withdrawal tickets
   3. Ledger reflects debits for approved withdrawals
-**Plans**: TBD
+**Plans**: 4 plans
+- [ ] 04-01-PLAN.md — Withdrawal Service & UI
+- [ ] 04-02-PLAN.md — Admin Infrastructure
+- [ ] 04-03-PLAN.md — Admin Command Center
+- [ ] 04-04-PLAN.md — Admin User Management
 **UI hint**: yes
 
 ### Phase 5: Advanced Security
@@ -76,7 +71,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Auth & Verification | 3/3 | Completed | 2026-04-30 |
-| 2. Dashboard & Onboarding | 2/4 | In Progress | - |
-| 3. Rebate Engine | 0/3 | Not started | - |
-| 4. Admin & Financials | 0/0 | Not started | - |
+| 2. Dashboard & Onboarding | 4/4 | Completed | 2026-04-30 |
+| 3. Rebate Engine | 3/3 | Completed | 2026-04-30 |
+| 4. Admin & Financials | 0/4 | In progress | - |
 | 5. Advanced Security | 0/0 | Not started | - |
