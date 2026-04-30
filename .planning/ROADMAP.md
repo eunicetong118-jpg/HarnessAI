@@ -4,8 +4,8 @@
 - [x] **Phase 1: Auth & Verification** - End-to-end secure registration and login
 - [x] **Phase 2: Dashboard & Onboarding** - MT5 linkage and user dashboard visualization
 - [x] **Phase 3: Rebate Engine** - Automated trade processing and calculation
-- [ ] **Phase 4: Admin & Financials** - Withdrawal tickets and admin command center
-- [ ] **Phase 5: Advanced Security** - TOTP 2FA and security audits
+- [x] **Phase 4: Admin & Financials** - Withdrawal tickets and admin command center
+- [x] **Phase 5: Advanced Security** - TOTP 2FA and security audits
 
 ## Phase Details
 
@@ -49,11 +49,7 @@
   1. User can request a withdrawal via a ticket system
   2. Admin can process verification and withdrawal tickets
   3. Ledger reflects debits for approved withdrawals
-**Plans**: 4 plans
-- [ ] 04-01-PLAN.md — Withdrawal Service & UI
-- [ ] 04-02-PLAN.md — Admin Infrastructure
-- [ ] 04-03-PLAN.md — Admin Command Center
-- [ ] 04-04-PLAN.md — Admin User Management
+**Plans**: Completed
 **UI hint**: yes
 
 ### Phase 5: Advanced Security
@@ -65,11 +61,7 @@
   2. 2FA (TOTP or Backup Codes) is required for logins and high-risk actions (withdrawals).
   3. Users can recover account access via secure backup codes.
   4. Application is hardened with security headers and CSP.
-**Plans**: 4 plans
-- [ ] 05-01-PLAN.md — TOTP Core & Enrollment
-- [ ] 05-02-PLAN.md — 2FA Guard (Withdrawals) & E2E Testing
-- [ ] 05-03-PLAN.md — Login 2FA, Backup Codes & Hardening
-- [ ] 05-04-PLAN.md — Audit & Finalization
+**Plans**: Completed
 **UI hint**: yes
 
 ## Progress Table
@@ -79,5 +71,5 @@
 | 1. Auth & Verification | 3/3 | Completed | 2026-04-30 |
 | 2. Dashboard & Onboarding | 4/4 | Completed | 2026-04-30 |
 | 3. Rebate Engine | 3/3 | Completed | 2026-04-30 |
-| 4. Admin & Financials | 0/4 | In progress | - |
-| 5. Advanced Security | 0/4 | Not started | - |
+| 4. Admin & Financials | 4/4 | Completed | 2026-04-30 |
+| 5. Advanced Security | 4/4 | Completed | 2026-04-30 |
