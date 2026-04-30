@@ -2,6 +2,7 @@ import prisma from '@/lib/prisma';
 import { encrypt, decrypt } from '@/lib/security/crypto';
 import { generateSecret, generateKeyuri, verifyToken, generateBackupCodes } from '@/lib/totp';
 import QRCode from 'qrcode';
+import bcrypt from 'bcryptjs';
 
 export class SecurityService {
   /**
@@ -55,18 +56,50 @@ export class SecurityService {
       return { success: false, error: 'Invalid verification code' };
     }
 
-    const backupCodes = generateBackupCodes();
+    const plainCodes = generateBackupCodes();
+    const hashedCodes = await Promise.all(
+      plainCodes.map(code => bcrypt.hash(code, 10))
+    );
 
-    // Enable 2FA and store backup codes
+    // Enable 2FA and store hashed backup codes
     await prisma.user.update({
       where: { id: userId },
       data: {
         totpEnabled: true,
-        twoFactorBackupCodes: backupCodes
+        twoFactorBackupCodes: hashedCodes
       }
     });
 
-    return { success: true, backupCodes };
+    return { success: true, backupCodes: plainCodes };
+  }
+
+  /**
+   * Regenerates backup codes for a user.
+   * Invalidates any existing backup codes.
+   */
+  static async regenerateBackupCodes(userId: string) {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { totpEnabled: true }
+    });
+
+    if (!user || !user.totpEnabled) {
+      throw new Error('2FA not enabled');
+    }
+
+    const plainCodes = generateBackupCodes();
+    const hashedCodes = await Promise.all(
+      plainCodes.map(code => bcrypt.hash(code, 10))
+    );
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        twoFactorBackupCodes: hashedCodes
+      }
+    });
+
+    return { backupCodes: plainCodes };
   }
 
   /**
@@ -91,8 +124,8 @@ export class SecurityService {
       return true;
     }
 
-    // 1. Try TOTP
-    if (user.totpSecret && code.length === 6) {
+    // 1. Try TOTP (6-digit numeric)
+    if (user.totpSecret && /^\d{6}$/.test(code)) {
       const secret = decrypt(user.totpSecret);
       if (verifyToken(code, secret)) {
         return true;
@@ -100,17 +133,20 @@ export class SecurityService {
     }
 
     // 2. Try Backup Code
-    if (user.twoFactorBackupCodes.includes(code)) {
-      // Consume backup code
-      await prisma.user.update({
-        where: { id: userId },
-        data: {
-          twoFactorBackupCodes: {
-            set: user.twoFactorBackupCodes.filter(c => c !== code)
+    // Since we store hashes, we need to check each one
+    for (const hashedCode of user.twoFactorBackupCodes) {
+      if (await bcrypt.compare(code, hashedCode)) {
+        // Consume backup code: remove this hash
+        await prisma.user.update({
+          where: { id: userId },
+          data: {
+            twoFactorBackupCodes: {
+              set: user.twoFactorBackupCodes.filter(h => h !== hashedCode)
+            }
           }
-        }
-      });
-      return true;
+        });
+        return true;
+      }
     }
 
     return false;
