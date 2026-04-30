@@ -5,6 +5,7 @@ import { createWithdrawal } from '@/services/withdrawal.service';
 
 const withdrawalSchema = z.object({
   amount: z.number().positive('Amount must be positive'),
+  securityCode: z.string().optional(),
 });
 
 /**
@@ -19,13 +20,13 @@ export const POST = auth(async (req) => {
 
   try {
     const body = await req.json();
-    const { amount } = withdrawalSchema.parse(body);
+    const { amount, securityCode } = withdrawalSchema.parse(body);
 
     // Convert USD to cents (BigInt)
     // We use Math.round to handle floating point issues if any
     const amountInCents = BigInt(Math.round(amount * 100));
 
-    const ticket = await createWithdrawal(session.user.id, amountInCents);
+    const ticket = await createWithdrawal(session.user.id, amountInCents, securityCode);
 
     return NextResponse.json({
       success: true,
@@ -40,10 +41,13 @@ export const POST = auth(async (req) => {
     }
 
     if (error instanceof Error) {
-      if (error.message === 'Insufficient balance') {
-        return NextResponse.json({ error: error.message }, { status: 400 });
+      if (error.message === '2FA_REQUIRED') {
+        return NextResponse.json({ error: '2FA required', code: '2FA_REQUIRED' }, { status: 403 });
       }
-      if (error.message === 'Amount must be greater than zero') {
+      if (error.message === 'INVALID_2FA_CODE') {
+        return NextResponse.json({ error: 'Invalid security code', code: 'INVALID_2FA_CODE' }, { status: 403 });
+      }
+      if (error.message === 'Insufficient balance' || error.message === 'Amount must be greater than zero') {
         return NextResponse.json({ error: error.message }, { status: 400 });
       }
     }

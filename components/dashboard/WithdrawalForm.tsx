@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertCircle, CheckCircle2, Loader2, ShieldAlert } from 'lucide-react';
+import { TwoFactorChallenge } from '@/components/security/TwoFactorChallenge';
 
 interface WithdrawalFormProps {
   availableBalance: number; // in USD
@@ -17,9 +18,11 @@ export function WithdrawalForm({ availableBalance, is2faEnabled }: WithdrawalFor
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [show2fa, setShow2fa] = useState(false);
+  const [securityCode, setSecurityCode] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async (e?: React.FormEvent, code?: string) => {
+    if (e) e.preventDefault();
     setError(null);
     setSuccess(null);
 
@@ -43,17 +46,29 @@ export function WithdrawalForm({ availableBalance, is2faEnabled }: WithdrawalFor
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ amount: withdrawalAmount }),
+        body: JSON.stringify({
+          amount: withdrawalAmount,
+          securityCode: code || securityCode
+        }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
+        if (data.code === '2FA_REQUIRED') {
+          setShow2fa(true);
+          setLoading(false);
+          return;
+        }
+        if (data.code === 'INVALID_2FA_CODE') {
+          throw new Error('Invalid security code. Please try again.');
+        }
         throw new Error(data.error || 'Failed to submit withdrawal request');
       }
 
       setSuccess(`Withdrawal request for $${withdrawalAmount.toFixed(2)} submitted successfully. It is now pending approval.`);
       setAmount('');
+      setShow2fa(false);
 
       // Optionally refresh the page to update balance
       setTimeout(() => {
@@ -65,6 +80,32 @@ export function WithdrawalForm({ availableBalance, is2faEnabled }: WithdrawalFor
       setLoading(false);
     }
   };
+
+  const handle2faVerify = (code: string) => {
+    setSecurityCode(code);
+    handleSubmit(undefined, code);
+  };
+
+  if (show2fa) {
+    return (
+      <Card className="w-full max-w-md mx-auto">
+        <CardHeader>
+          <CardTitle>Two-Factor Authentication</CardTitle>
+          <CardDescription>
+            Additional verification required for withdrawal.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <TwoFactorChallenge
+            onVerify={handle2faVerify}
+            onCancel={() => setShow2fa(false)}
+            error={error}
+            isLoading={loading}
+          />
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card className="w-full max-w-md mx-auto">
