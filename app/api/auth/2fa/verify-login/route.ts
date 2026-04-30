@@ -9,19 +9,20 @@ export async function POST(req: Request) {
   }
 
   try {
-    const { token } = await req.json();
-    if (!token) {
-      return NextResponse.json({ error: 'Token required' }, { status: 400 });
+    const { code } = await req.json();
+    if (!code) {
+      return NextResponse.json({ error: 'Code required' }, { status: 400 });
     }
 
-    const result = await SecurityService.verifyAndEnable(session.user.id, token);
-    if (!result.success) {
-      return NextResponse.json({ error: result.error }, { status: 400 });
+    const isValid = await SecurityService.verifySecurityCode(session.user.id, code);
+
+    if (!isValid) {
+      return NextResponse.json({ error: 'Invalid verification code' }, { status: 400 });
     }
 
-    return NextResponse.json({ success: true, backupCodes: result.backupCodes });
+    return NextResponse.json({ success: true });
   } catch (error: any) {
-    console.error('2FA Verify Error:', error);
+    console.error('2FA Verify Login Error:', error);
     return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
   }
 }
