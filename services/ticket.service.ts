@@ -21,6 +21,11 @@ export async function getTickets(filters?: {
           email: true,
         },
       },
+      assigneeUser: {
+        select: {
+          name: true,
+        },
+      },
     },
     orderBy: {
       createdAt: 'desc',
