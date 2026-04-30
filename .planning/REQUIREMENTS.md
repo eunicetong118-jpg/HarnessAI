@@ -27,7 +27,8 @@
 : 80% Formula Calculation.
 - [x] REB-04
 : Ledger Credit aggregation.
-- [ ] REB-05: Cron & Admin API Integration.
+- [x] REB-05
+: Cron & Admin API Integration.
 
 ## 4. Financials
 - [ ] Ledger Debit for withdrawals.
