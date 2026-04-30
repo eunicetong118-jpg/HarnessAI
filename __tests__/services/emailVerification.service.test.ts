@@ -13,7 +13,7 @@ describe('EmailVerification Service', () => {
     expect(sendMail).toHaveBeenCalledWith(
       'test@example.com',
       'Verify your email',
-      expect.stringContaining('/auth/verify/email?token=mock-token')
+      expect.stringContaining('/verify/email?token=mock-token')
     );
   });
 });

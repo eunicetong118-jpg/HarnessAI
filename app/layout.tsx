@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import "./lib/serialization"; // Ensure BigInt serialization is handled globally
+import "@/lib/serialization"; // Ensure BigInt serialization is handled globally
 import { SessionProvider } from "@/components/providers/SessionProvider";
 
 const inter = Inter({ subsets: ["latin"] });

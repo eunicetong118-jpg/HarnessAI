@@ -29,6 +29,19 @@ describe('SignupPage', () => {
     expect(screen.getByRole('button', { name: /sign up/i })).toBeDefined();
   });
 
+  it('shows error if password is too short', async () => {
+    render(<SignupPage />);
+
+    fireEvent.change(screen.getByLabelText(/name/i), { target: { value: 'John Doe' } });
+    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'john@example.com' } });
+    fireEvent.change(screen.getByLabelText(/^password$/i), { target: { value: 'short' } });
+    fireEvent.change(screen.getByLabelText(/confirm password/i), { target: { value: 'short' } });
+
+    fireEvent.click(screen.getByRole('button', { name: /sign up/i }));
+
+    expect(await screen.findByText(/password must be at least 8 characters/i)).toBeDefined();
+  });
+
   it('shows error if passwords do not match', async () => {
     render(<SignupPage />);
 
@@ -60,6 +73,9 @@ describe('SignupPage', () => {
     await waitFor(() => {
       expect(global.fetch).toHaveBeenCalledWith('/api/auth/register', expect.objectContaining({
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
           name: 'John Doe',
           email: 'john@example.com',

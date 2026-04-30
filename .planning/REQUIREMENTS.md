@@ -1,18 +1,16 @@
 # Requirements
 
-## 1. Authentication & Security (In Progress)
+## 1. Authentication & Security
 - [x] ActionToken service (hashes, TTL).
 - [x] EmailVerification service (link generation, mailing).
 - [x] Middleware guards (isLoggedIn -> isDisabled -> isEmailVerified).
 - [x] Connect services to Registration API.
 - [x] NextAuth v5 Configuration.
-- [ ] Verify Email API endpoint.
+- [x] Verify Email API endpoint.
 - [ ] Password Reset flow.
-- [ ] 2FA (TOTP) enrollment and verification.
-- [x] AUTH-07
-: Login Page implementation with credentials support and error handling.
-- [x] AUTH-08
-: Signup Page implementation with registration API integration and validation.
+- [x] 2FA (TOTP) enrollment and verification.
+- [x] AUTH-07: Login Page implementation with credentials support and error handling.
+- [x] AUTH-08: Signup Page implementation with registration API integration and validation.
 
 ## 2. Dashboard & Onboarding
 - [x] Dashboard layout with Recharts (mock data).
@@ -22,7 +20,7 @@
 - [x] MT5 Validation workflow (Admin Ticket).
 - [x] Broker Account status management.
 
-## 3. Rebate Engine (Phase 3)
+## 3. Rebate Engine
 - [x] REB-01: CSV/Excel Trade Ingest.
 - [x] REB-02: ReferenceID Deduplication.
 - [x] REB-03: 80% Formula Calculation.
@@ -30,14 +28,14 @@
 - [x] REB-05: Cron & Admin API Integration.
 
 ## 4. Financials
-- [ ] Ledger Debit for withdrawals.
-- [ ] Withdrawal Ticket system.
-- [ ] Balance calculation service.
+- [x] Ledger Debit for withdrawals.
+- [x] Withdrawal Ticket system.
+- [x] Balance calculation service.
 
 ## 5. Admin Command Center
-- [ ] User/Account management.
-- [ ] Ticket processing (Verification/Withdrawal).
-- [ ] Bulk MT5 validation.
+- [x] User/Account management.
+- [x] Ticket processing (Verification/Withdrawal).
+- [x] Bulk MT5 validation.
 
 ## Traceability
 
@@ -60,3 +58,4 @@
 | REB-03 (80% Formula) | Phase 3 | Completed |
 | REB-04 (Ledger Credit) | Phase 3 | Completed |
 | REB-05 (API Integration) | Phase 3 | Completed |
+| AUTH-01 (Email Verification) | Phase 6 | Completed |
