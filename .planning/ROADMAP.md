@@ -57,13 +57,19 @@
 **UI hint**: yes
 
 ### Phase 5: Advanced Security
-**Goal**: Secure fund payouts and infrastructure hardening.
+**Goal**: Multi-factor authentication and infrastructure hardening.
 **Depends on**: Phase 4
 **Requirements**: AUTH-06, SEC-01
 **Success Criteria** (what must be TRUE):
-  1. User can enroll and verify TOTP (2FA)
-  2. 2FA is required for high-risk actions (withdrawals)
-**Plans**: TBD
+  1. User can enroll and verify TOTP (2FA) with encrypted storage.
+  2. 2FA (TOTP or Backup Codes) is required for logins and high-risk actions (withdrawals).
+  3. Users can recover account access via secure backup codes.
+  4. Application is hardened with security headers and CSP.
+**Plans**: 4 plans
+- [ ] 05-01-PLAN.md — TOTP Core & Enrollment
+- [ ] 05-02-PLAN.md — 2FA Guard (Withdrawals) & E2E Testing
+- [ ] 05-03-PLAN.md — Login 2FA, Backup Codes & Hardening
+- [ ] 05-04-PLAN.md — Audit & Finalization
 **UI hint**: yes
 
 ## Progress Table
@@ -74,4 +80,4 @@
 | 2. Dashboard & Onboarding | 4/4 | Completed | 2026-04-30 |
 | 3. Rebate Engine | 3/3 | Completed | 2026-04-30 |
 | 4. Admin & Financials | 0/4 | In progress | - |
-| 5. Advanced Security | 0/0 | Not started | - |
+| 5. Advanced Security | 0/4 | Not started | - |
