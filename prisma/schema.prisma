@@ -39,8 +39,6 @@ model BrokerAccount {
   createdAt      DateTime  @default(now())
   lastModifiedAt DateTime  @updatedAt
   user           User      @relation(fields: [userId], references: [id])
-
-  @@index([userId])
 }
 
 model Ledger {
@@ -53,8 +51,6 @@ model Ledger {
   createdAt      DateTime  @default(now())
   lastModifiedAt DateTime  @updatedAt
   user           User      @relation(fields: [userId], references: [id])
-
-  @@index([userId])
 }
 
 model Ticket {
@@ -70,8 +66,6 @@ model Ticket {
   closedAt       DateTime?
   user           User         @relation("TicketCreator", fields: [userId], references: [id])
   assigneeUser   User?        @relation("TicketAssignee", fields: [assigneeUserId], references: [id])
-
-  @@index([userId])
 }
 
 model ActionToken {
@@ -83,8 +77,6 @@ model ActionToken {
   createdAt  DateTime        @default(now())
   consumedAt DateTime?
   user       User            @relation(fields: [userId], references: [id])
-
-  @@index([userId])
 }
 
 model Notification {
@@ -95,8 +87,6 @@ model Notification {
   createdAt      DateTime @default(now())
   lastModifiedAt DateTime @updatedAt
   user           User     @relation(fields: [userId], references: [id])
-
-  @@index([userId])
 }
 
 enum Role {
