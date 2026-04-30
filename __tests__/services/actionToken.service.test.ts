@@ -1,12 +1,12 @@
 import { createToken } from '@/services/actionToken.service';
 import prisma from '@/lib/prisma';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
-jest.mock('@/lib/prisma', () => ({
+vi.mock('@/lib/prisma', () => ({
   __esModule: true,
   default: {
     actionToken: {
-      create: jest.fn()
+      create: vi.fn()
     }
   }
 }));
@@ -30,7 +30,7 @@ describe('ActionToken Service', () => {
     );
 
     // Verify hashing works (stored token != raw token)
-    const callArgs = (prisma.actionToken.create as jest.Mock).mock.calls[0][0];
+    const callArgs = (prisma.actionToken.create as any).mock.calls[0][0];
     const storedHash = callArgs.data.token;
     const isMatch = await bcrypt.compare(rawToken, storedHash);
     expect(isMatch).toBe(true);

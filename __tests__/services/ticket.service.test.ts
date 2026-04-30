@@ -12,18 +12,18 @@ const TicketType = {
   VERIFICATION: 'VERIFICATION'
 } as const;
 
-jest.mock('@/lib/prisma', () => ({
+vi.mock('@/lib/prisma', () => ({
   __esModule: true,
   default: {
     ticket: {
-      findMany: jest.fn(),
-      findUnique: jest.fn(),
-      update: jest.fn(),
+      findMany: vi.fn(),
+      findUnique: vi.fn(),
+      update: vi.fn(),
     },
     brokerAccount: {
-      update: jest.fn(),
+      update: vi.fn(),
     },
-    $transaction: jest.fn((callback) => callback(prisma)),
+    $transaction: vi.fn((callback) => callback(prisma)),
   },
 }));
 
@@ -32,7 +32,7 @@ describe('Ticket Service', () => {
   const ticketId = 'ticket-1';
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   describe('getTickets', () => {
@@ -40,7 +40,7 @@ describe('Ticket Service', () => {
       const mockTickets = [
         { id: '1', status: 'PENDING', type: 'WITHDRAWAL', user: { name: 'User 1', email: 'user1@example.com' } },
       ];
-      (prisma.ticket.findMany as jest.Mock).mockResolvedValue(mockTickets);
+      (prisma.ticket.findMany as any).mockResolvedValue(mockTickets);
 
       const result = await getTickets({ status: TicketStatus.PENDING, type: TicketType.WITHDRAWAL });
 
@@ -56,6 +56,11 @@ describe('Ticket Service', () => {
               email: true,
             },
           },
+          assigneeUser: {
+            select: {
+              name: true,
+            },
+          },
         },
         orderBy: {
           createdAt: 'desc',
@@ -67,7 +72,7 @@ describe('Ticket Service', () => {
 
   describe('claimTicket', () => {
     it('sets assigneeUserId to current admin ID', async () => {
-      (prisma.ticket.update as jest.Mock).mockResolvedValue({ id: ticketId, assigneeUserId: adminId });
+      (prisma.ticket.update as any).mockResolvedValue({ id: ticketId, assigneeUserId: adminId });
 
       await claimTicket(ticketId, adminId);
 
@@ -80,7 +85,7 @@ describe('Ticket Service', () => {
 
   describe('resolveTicket', () => {
     it('sets status to DONE and sets closedAt', async () => {
-      (prisma.ticket.findUnique as jest.Mock).mockResolvedValue({
+      (prisma.ticket.findUnique as any).mockResolvedValue({
         id: ticketId,
         type: TicketType.WITHDRAWAL,
       });
@@ -99,7 +104,7 @@ describe('Ticket Service', () => {
 
     it('verifies BrokerAccount if ticket type is VERIFICATION', async () => {
       const mt5AccountNo = '12345';
-      (prisma.ticket.findUnique as jest.Mock).mockResolvedValue({
+      (prisma.ticket.findUnique as any).mockResolvedValue({
         id: ticketId,
         type: TicketType.VERIFICATION,
         metadata: { mt5AccountNo },

@@ -2,9 +2,9 @@ import { sendVerificationEmail } from '@/services/emailVerification.service';
 import { sendMail } from '@/lib/email';
 import { createToken } from '@/services/actionToken.service';
 
-jest.mock('@/lib/email', () => ({ sendMail: jest.fn() }));
-jest.mock('@/services/actionToken.service', () => ({
-  createToken: jest.fn().mockResolvedValue('mock-token')
+vi.mock('@/lib/email', () => ({ sendMail: vi.fn() }));
+vi.mock('@/services/actionToken.service', () => ({
+  createToken: vi.fn().mockResolvedValue('mock-token')
 }));
 
 describe('EmailVerification Service', () => {

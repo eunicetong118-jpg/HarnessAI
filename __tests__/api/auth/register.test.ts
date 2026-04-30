@@ -1,30 +1,35 @@
 import { POST } from '@/app/api/auth/register/route';
 import prisma from '@/lib/prisma';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import * as emailService from '@/services/emailVerification.service';
 
-jest.mock('@/lib/prisma', () => ({
-  user: {
-    findUnique: jest.fn(),
-    create: jest.fn(),
+vi.mock('@/lib/prisma', () => ({
+  __esModule: true,
+  default: {
+    user: {
+      findUnique: vi.fn(),
+      create: vi.fn(),
+    },
   },
 }));
 
-jest.mock('bcrypt', () => ({
-  hash: jest.fn(),
+vi.mock('bcryptjs', () => ({
+  default: {
+    hash: vi.fn(),
+  },
 }));
 
-jest.mock('@/services/emailVerification.service', () => ({
-  sendVerificationEmail: jest.fn(),
+vi.mock('@/services/emailVerification.service', () => ({
+  sendVerificationEmail: vi.fn(),
 }));
 
 describe('POST /api/auth/register', () => {
   const mockReq = (body: any) => ({
-    json: jest.fn().mockResolvedValue(body),
+    json: vi.fn().mockResolvedValue(body),
   } as unknown as Request);
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should register user successfully', async () => {
@@ -34,9 +39,9 @@ describe('POST /api/auth/register', () => {
       password: 'password123',
     };
 
-    (prisma.user.findUnique as jest.Mock).mockResolvedValue(null);
-    (bcrypt.hash as jest.Mock).mockResolvedValue('hashedPassword');
-    (prisma.user.create as jest.Mock).mockResolvedValue({
+    (prisma.user.findUnique as any).mockResolvedValue(null);
+    (bcrypt.hash as any).mockResolvedValue('hashedPassword');
+    (prisma.user.create as any).mockResolvedValue({
       id: 'user-id',
       email: body.email,
     });
@@ -63,7 +68,7 @@ describe('POST /api/auth/register', () => {
       password: 'password123',
     };
 
-    (prisma.user.findUnique as jest.Mock).mockResolvedValue({ id: 'existing' });
+    (prisma.user.findUnique as any).mockResolvedValue({ id: 'existing' });
 
     const res = await POST(mockReq(body));
     const data = await res.json();

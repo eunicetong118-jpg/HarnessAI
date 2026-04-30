@@ -2,43 +2,44 @@ import { RebateService, NormalizedTrade } from '@/services/rebate.service';
 import prisma from '@/lib/prisma';
 import * as XLSX from 'xlsx';
 
-// Define mocks in the outer scope
-const mockProcessedTradeCreateMany = jest.fn().mockResolvedValue({ count: 0 });
-const mockLedgerCreate = jest.fn().mockResolvedValue({ id: 'l1' });
-
 // Mock Prisma
-jest.mock('@/lib/prisma', () => ({
-  __esModule: true,
-  default: {
-    brokerAccount: {
-      findUnique: jest.fn(),
+vi.mock('@/lib/prisma', () => {
+  const mockProcessedTradeCreateMany = vi.fn().mockResolvedValue({ count: 0 });
+  const mockLedgerCreate = vi.fn().mockResolvedValue({ id: 'l1' });
+
+  return {
+    __esModule: true,
+    default: {
+      brokerAccount: {
+        findUnique: vi.fn(),
+      },
+      processedTrade: {
+        findMany: vi.fn(),
+        createMany: mockProcessedTradeCreateMany,
+      },
+      ledger: {
+        create: mockLedgerCreate,
+      },
+      $transaction: vi.fn(async (cb) => {
+        const tx = {
+          processedTrade: {
+            createMany: mockProcessedTradeCreateMany,
+          },
+          ledger: {
+            create: mockLedgerCreate,
+          },
+        };
+        return await cb(tx);
+      }),
     },
-    processedTrade: {
-      findMany: jest.fn(),
-      createMany: mockProcessedTradeCreateMany,
-    },
-    ledger: {
-      create: mockLedgerCreate,
-    },
-    $transaction: jest.fn(async (cb) => {
-      const tx = {
-        processedTrade: {
-          createMany: mockProcessedTradeCreateMany,
-        },
-        ledger: {
-          create: mockLedgerCreate,
-        },
-      };
-      return await cb(tx);
-    }),
-  },
-}));
+  };
+});
 
 // Mock XLSX
-jest.mock('xlsx', () => ({
-  read: jest.fn(),
+vi.mock('xlsx', () => ({
+  read: vi.fn(),
   utils: {
-    sheet_to_json: jest.fn(),
+    sheet_to_json: vi.fn(),
   },
 }));
 
@@ -46,7 +47,7 @@ describe('RebateService', () => {
   const mockBuffer = Buffer.from('test');
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    vi.clearAllMocks();
   });
 
   it('should parse a valid CSV/Excel buffer and return normalized trades', async () => {
@@ -56,15 +57,15 @@ describe('RebateService', () => {
       { tradeId: 'T101', mt5AccountNo: '654321', volume: 0.5, rebatePerLot: 10.0 },
     ];
 
-    (XLSX.read as jest.Mock).mockReturnValue({
+    (XLSX.read as any).mockReturnValue({
       SheetNames: ['Sheet1'],
       Sheets: { Sheet1: {} },
     });
 
-    (XLSX.utils.sheet_to_json as jest.Mock).mockReturnValue(mockData);
+    (XLSX.utils.sheet_to_json as any).mockReturnValue(mockData);
 
     // Mock Prisma lookups
-    (prisma.brokerAccount.findUnique as jest.Mock).mockImplementation(({ where }) => {
+    (prisma.brokerAccount.findUnique as any).mockImplementation(({ where }: any) => {
       if (where.mt5AccountNo === '123456') {
         return Promise.resolve({
           userId: 'user-1',
@@ -108,13 +109,13 @@ describe('RebateService', () => {
       { tradeId: 'T102', mt5AccountNo: 'unknown', volume: 1.0, rebatePerLot: 5.0 },
     ];
 
-    (XLSX.read as jest.Mock).mockReturnValue({
+    (XLSX.read as any).mockReturnValue({
       SheetNames: ['Sheet1'],
       Sheets: { Sheet1: {} },
     });
 
-    (XLSX.utils.sheet_to_json as jest.Mock).mockReturnValue(mockData);
-    (prisma.brokerAccount.findUnique as jest.Mock).mockResolvedValue(null);
+    (XLSX.utils.sheet_to_json as any).mockReturnValue(mockData);
+    (prisma.brokerAccount.findUnique as any).mockResolvedValue(null);
 
     const results = await RebateService.ingestTrades(mockBuffer);
     expect(results).toHaveLength(0);
@@ -125,13 +126,13 @@ describe('RebateService', () => {
       { tradeId: 'T103', mt5AccountNo: '999999', volume: 1.0, rebatePerLot: 5.0 },
     ];
 
-    (XLSX.read as jest.Mock).mockReturnValue({
+    (XLSX.read as any).mockReturnValue({
       SheetNames: ['Sheet1'],
       Sheets: { Sheet1: {} },
     });
 
-    (XLSX.utils.sheet_to_json as jest.Mock).mockReturnValue(mockData);
-    (prisma.brokerAccount.findUnique as jest.Mock).mockResolvedValue({
+    (XLSX.utils.sheet_to_json as any).mockReturnValue(mockData);
+    (prisma.brokerAccount.findUnique as any).mockResolvedValue({
       userId: 'user-3',
       status: 'PENDING',
       isActive: true,
@@ -175,7 +176,7 @@ describe('RebateService', () => {
     });
 
     it('should skip duplicate trade IDs that already exist in ProcessedTrade', async () => {
-      (prisma.processedTrade.findMany as jest.Mock).mockResolvedValue([
+      (prisma.processedTrade.findMany as any).mockResolvedValue([
         { tradeId: 'T100' },
       ]);
 
@@ -187,15 +188,18 @@ describe('RebateService', () => {
     });
 
     it('should aggregate multiple trades for the same user into a single batch ledger entry', async () => {
-      (prisma.processedTrade.findMany as jest.Mock).mockResolvedValue([]);
+      (prisma.processedTrade.findMany as any).mockResolvedValue([]);
 
       await RebateService.processBatch(trades);
 
       // Should have 2 ledger entries: one for user-1 (T100+T101) and one for user-2 (T102)
-      expect(mockLedgerCreate).toHaveBeenCalledTimes(2);
+      // Since we can't easily check mockLedgerCreate outside the mock factory anymore without exporting it,
+      // we'll rely on the fact that the test reaches this point without error and returns correct counts.
+      // But we can check that ledger.create was called on the prisma mock.
+      expect(prisma.ledger.create).toHaveBeenCalledTimes(2);
 
       // Verify user-1 aggregation: 800 + 1600 = 2400
-      expect(mockLedgerCreate).toHaveBeenCalledWith(expect.objectContaining({
+      expect(prisma.ledger.create).toHaveBeenCalledWith(expect.objectContaining({
         data: expect.objectContaining({
           userId: 'user-1',
           amount: BigInt(2400),
@@ -206,11 +210,11 @@ describe('RebateService', () => {
     });
 
     it('should insert ProcessedTrade records for every successfully processed tradeId', async () => {
-      (prisma.processedTrade.findMany as jest.Mock).mockResolvedValue([]);
+      (prisma.processedTrade.findMany as any).mockResolvedValue([]);
 
       await RebateService.processBatch(trades);
 
-      expect(mockProcessedTradeCreateMany).toHaveBeenCalledWith({
+      expect(prisma.processedTrade.createMany).toHaveBeenCalledWith({
         data: expect.arrayContaining([
           { tradeId: 'T100', userId: 'user-1' },
           { tradeId: 'T101', userId: 'user-1' },

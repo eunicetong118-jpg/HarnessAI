@@ -2,6 +2,30 @@ import { parseCsv, bulkVerify } from '@/services/verification.service';
 import prisma from '@/lib/prisma';
 import { Readable } from 'stream';
 
+vi.mock('@/lib/prisma', () => ({
+  __esModule: true,
+  default: {
+    brokerAccount: {
+      deleteMany: vi.fn(),
+      createMany: vi.fn(),
+      findUnique: vi.fn(),
+      update: vi.fn(),
+    },
+    ticket: {
+      deleteMany: vi.fn(),
+      create: vi.fn(),
+      findMany: vi.fn(),
+      update: vi.fn(),
+      findFirst: vi.fn(),
+    },
+    user: {
+      deleteMany: vi.fn(),
+      create: vi.fn(),
+    },
+    $transaction: vi.fn((callback) => callback(prisma)),
+  },
+}));
+
 describe('VerificationService', () => {
   describe('parseCsv', () => {
     it('should extract mt5AccountNo from CSV stream', async () => {
@@ -22,36 +46,23 @@ describe('VerificationService', () => {
 
   describe('bulkVerify', () => {
     beforeEach(async () => {
-      await prisma.brokerAccount.deleteMany();
-      await prisma.ticket.deleteMany();
-      await prisma.user.deleteMany();
+      vi.clearAllMocks();
     });
 
     it('should verify matching accounts and close associated tickets', async () => {
-      const user = await prisma.user.create({
-        data: {
-          name: 'Test User',
-          email: 'test@example.com',
-        },
+      const user = { id: 'user-1', name: 'Test User', email: 'test@example.com' };
+      (prisma.user.create as any).mockResolvedValue(user);
+
+      (prisma.brokerAccount.findUnique as any).mockImplementation(({ where }: any) => {
+        if (where.mt5AccountNo === '123') return Promise.resolve({ id: 'acc-123', status: 'PENDING' });
+        if (where.mt5AccountNo === '456') return Promise.resolve({ id: 'acc-456', status: 'PENDING' });
+        if (where.mt5AccountNo === '789') return Promise.resolve({ id: 'acc-789', status: 'VERIFIED' });
+        return Promise.resolve(null);
       });
 
-      await prisma.brokerAccount.createMany({
-        data: [
-          { userId: user.id, mt5AccountNo: '123', status: 'PENDING' },
-          { userId: user.id, mt5AccountNo: '456', status: 'PENDING' },
-          { userId: user.id, mt5AccountNo: '789', status: 'VERIFIED' },
-        ],
-      });
-
-      await prisma.ticket.create({
-        data: {
-          userId: user.id,
-          type: 'VERIFICATION',
-          status: 'PENDING',
-          content: 'Verify 123',
-          metadata: { mt5AccountNo: '123' },
-        },
-      });
+      (prisma.ticket.findMany as any).mockResolvedValue([
+        { id: 't-123', type: 'VERIFICATION', status: 'PENDING', metadata: { mt5AccountNo: '123' } }
+      ]);
 
       const results = await bulkVerify(['123', '456', '789', '000']);
 
@@ -59,13 +70,15 @@ describe('VerificationService', () => {
       expect(results.alreadyVerified).toBe(1); // 789
       expect(results.notFound).toBe(1); // 000
 
-      const acc123 = await prisma.brokerAccount.findUnique({ where: { mt5AccountNo: '123' } });
-      expect(acc123?.status).toBe('VERIFIED');
+      expect(prisma.brokerAccount.update).toHaveBeenCalledWith(expect.objectContaining({
+        where: { id: 'acc-123' },
+        data: expect.objectContaining({ status: 'VERIFIED' })
+      }));
 
-      const ticket123 = await prisma.ticket.findFirst({
-        where: { metadata: { path: ['mt5AccountNo'], equals: '123' } },
-      });
-      expect(ticket123?.status).toBe('DONE');
+      expect(prisma.ticket.update).toHaveBeenCalledWith(expect.objectContaining({
+        where: { id: 't-123' },
+        data: expect.objectContaining({ status: 'DONE' })
+      }));
     });
   });
 });
