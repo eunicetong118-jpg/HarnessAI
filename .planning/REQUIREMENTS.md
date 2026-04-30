@@ -18,11 +18,12 @@
 - [ ] MT5 Validation workflow (Admin Ticket).
 - [ ] Broker Account status management.
 
-## 3. Rebate Engine
-- [ ] CSV/Excel Trade Ingest.
-- [ ] ReferenceID Deduplication.
-- [ ] 80% Formula Calculation.
-- [ ] Ledger Credit aggregation.
+## 3. Rebate Engine (Phase 3)
+- [ ] REB-01: CSV/Excel Trade Ingest.
+- [ ] REB-02: ReferenceID Deduplication.
+- [ ] REB-03: 80% Formula Calculation.
+- [ ] REB-04: Ledger Credit aggregation.
+- [ ] REB-05: Cron & Admin API Integration.
 
 ## 4. Financials
 - [ ] Ledger Debit for withdrawals.
@@ -48,3 +49,8 @@
 | DASH-03 (Pending Banner) | Phase 2 | Pending |
 | BROK-01 (MT5 Linkage UI) | Phase 2 | Pending |
 | BROK-02 (MT5 Validation) | Phase 2 | Pending |
+| REB-01 (Trade Ingest) | Phase 3 | Pending |
+| REB-02 (Deduplication) | Phase 3 | Pending |
+| REB-03 (80% Formula) | Phase 3 | Pending |
+| REB-04 (Ledger Credit) | Phase 3 | Pending |
+| REB-05 (API Integration) | Phase 3 | Pending |

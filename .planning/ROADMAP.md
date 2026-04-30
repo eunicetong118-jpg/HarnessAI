@@ -39,12 +39,16 @@ Plans:
 ### Phase 3: Rebate Engine
 **Goal**: Automated trade processing.
 **Depends on**: Phase 2
-**Requirements**: REB-01, REB-02, REB-03
+**Requirements**: REB-01, REB-02, REB-03, REB-04, REB-05
 **Success Criteria** (what must be TRUE):
   1. System can ingest CSV/Excel trade logs
   2. System correctly calculates rebates using the 80% formula
   3. Ledger credits are aggregated without duplication
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 03-01-PLAN.md — Trade Model & Ingestion
+- [ ] 03-02-PLAN.md — Calculation & Aggregation
+- [ ] 03-03-PLAN.md — Cron & Admin API
 
 ### Phase 4: Admin & Financials
 **Goal**: Secure fund payouts and admin management.
@@ -73,6 +77,6 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Auth & Verification | 3/3 | Completed | 2026-04-30 |
 | 2. Dashboard & Onboarding | 2/4 | In Progress | - |
-| 3. Rebate Engine | 0/0 | Not started | - |
+| 3. Rebate Engine | 0/3 | Not started | - |
 | 4. Admin & Financials | 0/0 | Not started | - |
 | 5. Advanced Security | 0/0 | Not started | - |
