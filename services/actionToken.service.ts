@@ -1,8 +1,8 @@
-import prisma from '@/lib/prisma';
+import prisma, { DB } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import { randomBytes } from 'crypto';
 
-export async function createToken(userId: string, type: 'EMAIL_VERIFICATION' | 'PASSWORD_RESET') {
+export async function createToken(userId: string, type: 'EMAIL_VERIFICATION' | 'PASSWORD_RESET', tx?: DB) {
   const rawToken = randomBytes(16).toString('hex');
   const hash = await bcrypt.hash(rawToken, 12);
 
@@ -10,7 +10,7 @@ export async function createToken(userId: string, type: 'EMAIL_VERIFICATION' | '
   const expiresAt = new Date();
   expiresAt.setHours(expiresAt.getHours() + ttl);
 
-  await prisma.actionToken.create({
+  await (tx || prisma).actionToken.create({
     data: {
       userId,
       tokenType: type,
@@ -22,8 +22,9 @@ export async function createToken(userId: string, type: 'EMAIL_VERIFICATION' | '
   return rawToken;
 }
 
-export async function validateToken(userId: string, token: string, type: 'EMAIL_VERIFICATION' | 'PASSWORD_RESET') {
-  const actionToken = await prisma.actionToken.findFirst({
+export async function validateToken(userId: string, token: string, type: 'EMAIL_VERIFICATION' | 'PASSWORD_RESET', tx?: DB) {
+  const db = tx || prisma;
+  const actionToken = await db.actionToken.findFirst({
     where: {
       userId,
       tokenType: type,
@@ -43,7 +44,7 @@ export async function validateToken(userId: string, token: string, type: 'EMAIL_
     return { success: false, error: 'Invalid or expired token' };
   }
 
-  await prisma.actionToken.update({
+  await db.actionToken.update({
     where: { id: actionToken.id },
     data: { consumedAt: new Date() }
   });

@@ -1,5 +1,6 @@
-import prisma from '@/lib/prisma';
+import prisma, { DB } from '@/lib/prisma';
 import { IB_MAPPING } from '@/config/ib-mapping';
+import * as TicketService from './ticket.service';
 
 /**
  * Links an MT5 account to a user and creates a verification ticket.
@@ -7,10 +8,11 @@ import { IB_MAPPING } from '@/config/ib-mapping';
  * @param userId - The ID of the user linking the account
  * @param mt5AccountNo - The MT5 account number
  * @param countryCode - The country code selected by the user
+ * @param tx - Optional transaction client
  * @returns The created broker account and ticket
  * @throws Error if validation fails or account is already linked
  */
-export async function linkAccount(userId: string, mt5AccountNo: string, countryCode: string) {
+export async function linkAccount(userId: string, mt5AccountNo: string, countryCode: string, tx?: DB) {
   // 1. Validate mt5AccountNo (numeric, length check)
   if (!/^\d+$/.test(mt5AccountNo)) {
     throw new Error('MT5 Account Number must be numeric');
@@ -19,8 +21,10 @@ export async function linkAccount(userId: string, mt5AccountNo: string, countryC
     throw new Error('MT5 Account Number must be at least 5 digits');
   }
 
+  const db = tx || prisma;
+
   // 2. Check if mt5AccountNo is already linked
-  const existing = await prisma.brokerAccount.findUnique({
+  const existing = await db.brokerAccount.findUnique({
     where: { mt5AccountNo },
   });
 
@@ -33,9 +37,9 @@ export async function linkAccount(userId: string, mt5AccountNo: string, countryC
     throw new Error('Invalid country code');
   }
 
-  // 3. Create BrokerAccount and Ticket in a transaction
-  return await prisma.$transaction(async (tx) => {
-    const brokerAccount = await tx.brokerAccount.create({
+  const performLinkage = async (client: DB) => {
+    // 3. Create BrokerAccount
+    const brokerAccount = await client.brokerAccount.create({
       data: {
         userId,
         mt5AccountNo,
@@ -43,22 +47,24 @@ export async function linkAccount(userId: string, mt5AccountNo: string, countryC
       },
     });
 
-    const ticket = await tx.ticket.create({
-      data: {
-        userId,
-        type: 'VERIFICATION',
-        status: 'PENDING',
-        content: `MT5 Account Linkage Request: ${mt5AccountNo} (${ibConfig.countryName})`,
-        metadata: {
-          mt5AccountNo,
-          countryCode,
-          ibUrl: ibConfig.ibUrl,
-        },
-      },
-    });
+    // 4. Create Ticket using TicketService
+    const ticket = await TicketService.createAccountVerificationTicket(userId, {
+      mt5AccountNo,
+      broker: ibConfig.countryName,
+      countryCode,
+      ibUrl: ibConfig.ibUrl,
+    }, client);
 
     return { brokerAccount, ticket };
-  });
+  };
+
+  if (tx) {
+    return await performLinkage(tx);
+  } else {
+    return await prisma.$transaction(async (pTx) => {
+      return await performLinkage(pTx);
+    });
+  }
 }
 
 /**
@@ -66,10 +72,11 @@ export async function linkAccount(userId: string, mt5AccountNo: string, countryC
  * Used for dashboard route guards.
  *
  * @param userId - The ID of the user to check
+ * @param tx - Optional transaction client
  * @returns Boolean indicating if the user has any linked accounts
  */
-export async function hasLinkedAccount(userId: string) {
-  const count = await prisma.brokerAccount.count({
+export async function hasLinkedAccount(userId: string, tx?: DB) {
+  const count = await (tx || prisma).brokerAccount.count({
     where: { userId },
   });
   return count > 0;
@@ -79,10 +86,11 @@ export async function hasLinkedAccount(userId: string) {
  * Gets all broker accounts for a user.
  *
  * @param userId - The ID of the user to check
+ * @param tx - Optional transaction client
  * @returns Array of broker accounts
  */
-export async function getBrokerAccounts(userId: string) {
-  return await prisma.brokerAccount.findMany({
+export async function getBrokerAccounts(userId: string, tx?: DB) {
+  return await (tx || prisma).brokerAccount.findMany({
     where: { userId },
   });
 }
