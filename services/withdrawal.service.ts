@@ -1,17 +1,37 @@
 import prisma from '@/lib/prisma';
 import { getBalance } from '@/services/ledger.service';
+import { SecurityService } from '@/services/security.service';
 
 /**
  * Creates a withdrawal request.
  * Debits the amount from the available balance immediately.
  *
+ * Requires 2FA verification if enabled for the user.
+ *
  * @param userId - The ID of the user
  * @param amount - The amount to withdraw in cents (BigInt)
+ * @param securityCode - (Optional) 2FA or Backup code
  * @returns The created withdrawal ticket
  */
-export async function createWithdrawal(userId: string, amount: bigint) {
+export async function createWithdrawal(userId: string, amount: bigint, securityCode?: string) {
   if (amount <= BigInt(0)) {
     throw new Error('Amount must be greater than zero');
+  }
+
+  // 0. Verify 2FA if enabled
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { totpEnabled: true }
+  });
+
+  if (user?.totpEnabled) {
+    if (!securityCode) {
+      throw new Error('2FA_REQUIRED');
+    }
+    const isValid = await SecurityService.verifySecurityCode(userId, securityCode);
+    if (!isValid) {
+      throw new Error('INVALID_2FA_CODE');
+    }
   }
 
   // Use a transaction to ensure atomic balance check and debit
