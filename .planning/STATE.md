@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: completed
-last_updated: "2026-04-30T02:17:18.591Z"
+last_updated: "2026-04-30T02:34:43.308Z"
 progress:
   total_phases: 5
   completed_phases: 1
   total_plans: 10
-  completed_plans: 5
-  percent: 50
+  completed_plans: 6
+  percent: 60
 ---
 
 # State
@@ -23,9 +23,9 @@ progress:
 ## Current Position
 
 Phase: 03-rebate-engine
-Plan: 01
+Plan: 02
 Status: Completed
-Progress: [█████░░░░░] 50%
+Progress: [██████░░░░] 60%
 
 ## Performance Metrics
 
@@ -59,6 +59,9 @@ Progress: [█████░░░░░] 50%
 - Using localStorage to persist milestone celebration state to ensure it only plays once.
 - Used zod for strict validation of trade log rows.
 - Skipped invalid or unverified MT5 accounts during ingestion to ensure data integrity.
+- Implemented 80% rebate formula with BigInt precision.
+- Used ProcessedTrade model for atomic trade deduplication.
+- Aggregated batch rebates per user to minimize ledger noise.
 
 ### Todos
 

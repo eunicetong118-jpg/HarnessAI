@@ -23,8 +23,10 @@
 : CSV/Excel Trade Ingest.
 - [x] REB-02
 : ReferenceID Deduplication.
-- [ ] REB-03: 80% Formula Calculation.
-- [ ] REB-04: Ledger Credit aggregation.
+- [x] REB-03
+: 80% Formula Calculation.
+- [x] REB-04
+: Ledger Credit aggregation.
 - [ ] REB-05: Cron & Admin API Integration.
 
 ## 4. Financials
