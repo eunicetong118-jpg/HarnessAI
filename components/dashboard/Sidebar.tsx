@@ -3,12 +3,13 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, Wallet, Settings, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { signOut } from 'next-auth/react';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { name: 'Withdraw', href: '/dashboard/withdraw', icon: Wallet },
   { name: 'Settings', href: '/dashboard/settings', icon: Settings },
 ];
 
