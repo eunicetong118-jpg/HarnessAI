@@ -8,6 +8,13 @@ const config: Config = {
   ],
   theme: {
     extend: {
+      colors: {
+        'design-bg': '#0f0b1f',
+        'design-surface': '#15102b',
+        'design-card': '#1e183d',
+        'design-pink': '#ec4899', // pink-500
+        'design-purple': '#9333ea', // purple-600
+      },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":
