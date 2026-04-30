@@ -6,6 +6,7 @@
 - [x] **Phase 3: Rebate Engine** - Automated trade processing and calculation
 - [x] **Phase 4: Admin & Financials** - Withdrawal tickets and admin command center
 - [x] **Phase 5: Advanced Security** - TOTP 2FA and security audits
+- [ ] **Phase 6: Auth UI** - Login and Signup pages implementation
 
 ## Phase Details
 
@@ -64,6 +65,19 @@
 **Plans**: Completed
 **UI hint**: yes
 
+### Phase 6: Auth UI
+**Goal**: Implement secure and aesthetically consistent Login and Signup pages, including email verification.
+**Depends on**: Phase 1
+**Requirements**: AUTH-07, AUTH-08, AUTH-01
+**Success Criteria** (what must be TRUE):
+  1. User can register via the Signup page with validation errors displayed
+  2. User can login via the Login page and be redirected to the dashboard
+  3. User can verify their email via a dedicated verification page
+  4. UI follows the dark theme aesthetic (#0A0A0F background, #12121A cards)
+**Plans**:
+- [x] 06-01-PLAN.md — Login and Signup pages
+- [ ] 06-02-PLAN.md — Email verification page
+
 ## Progress Table
 
 | Phase | Plans Complete | Status | Completed |
@@ -73,3 +87,4 @@
 | 3. Rebate Engine | 3/3 | Completed | 2026-04-30 |
 | 4. Admin & Financials | 4/4 | Completed | 2026-04-30 |
 | 5. Advanced Security | 4/4 | Completed | 2026-04-30 |
+| 6. Auth UI | 1/2 | In Progress | - |
