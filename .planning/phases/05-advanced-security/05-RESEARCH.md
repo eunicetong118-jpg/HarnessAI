@@ -35,17 +35,20 @@ This research phase defines the implementation strategy for Phase 5 (Advanced Se
 |---------|---------|---------|--------------|
 | `zod` | 3.x | Input Validation | Validating 2FA codes and security-sensitive inputs. |
 | `next-auth` | 5.0.0-beta.15 | Session management | Already used; needs update to include 2FA flags in JWT/Session. |
+| `vitest` | Latest | Unit/Integration testing | Faster, Vite-native alternative to Jest. |
+| `@playwright/test`| Latest | E2E testing | Modern, robust browser automation for security flows. |
 
 ### Alternatives Considered
 | Instead of | Could Use | Tradeoff |
 |------------|-----------|----------|
 | `otplib` | `speakeasy` | `otplib` is more actively maintained and has better TypeScript support. |
 | `crypto` (native) | `prisma-field-encryption` | Native `crypto` avoids extra dependency and gives full control over IV/Tag storage. |
+| `Jest` | `Vitest` | `Vitest` provides better ESM support and is significantly faster in Next.js environments. |
 
 **Installation:**
 ```bash
-npm install qrcode
-npm install -D @types/qrcode
+npm install qrcode otplib
+npm install -D @types/qrcode vitest @playwright/test
 ```
 
 ## Architecture Patterns
@@ -158,6 +161,8 @@ const securityHeaders = [
 |------------|------------|-----------|---------|----------|
 | `otplib` | 2FA Logic | ✓ | 12.0.1 | — |
 | `qrcode` | Enrollment | ✗ | — | Install via npm |
+| `vitest` | Testing | ✗ | — | Install via npm |
+| `playwright`| E2E Testing | ✗ | — | Install via npm |
 | `PostgreSQL` | Storage | ✓ | 16.x | — |
 
 ## Validation Architecture
@@ -165,16 +170,18 @@ const securityHeaders = [
 ### Test Framework
 | Property | Value |
 |----------|-------|
-| Framework | Jest |
-| Config file | `jest.config.ts` |
-| Quick run command | `npm test` |
+| Unit/Integration | Vitest |
+| End-to-End | Playwright |
+| Config files | `vitest.config.ts`, `playwright.config.ts` |
+| Quick run command | `npm test` (mapped to vitest), `npx playwright test` |
 
 ### Phase Requirements → Test Map
 | Req ID | Behavior | Test Type | Automated Command | File Exists? |
 |--------|----------|-----------|-------------------|-------------|
-| AUTH-06 | 2FA Enrollment | Unit | `npm test __tests__/services/auth.service.test.ts` | ❌ Wave 0 |
-| AUTH-06 | 2FA Verification | Unit | `npm test __tests__/services/auth.service.test.ts` | ❌ Wave 0 |
-| SEC-01 | Withdrawal 2FA Guard | Integration | `npm test __tests__/services/withdrawal.service.test.ts` | ❌ Wave 0 |
+| AUTH-06 | 2FA Enrollment | Unit | `npx vitest run services/security.service.ts` | ❌ Wave 0 |
+| AUTH-06 | 2FA Verification | Unit | `npx vitest run services/security.service.ts` | ❌ Wave 0 |
+| SEC-01 | Withdrawal 2FA Guard | Integration | `npx vitest run services/withdrawal.service.test.ts` | ❌ Wave 0 |
+| SEC-02 | Login 2FA Protection| E2E | `npx playwright test tests/e2e/auth-2fa.spec.ts` | ❌ Wave 0 |
 
 ## Security Domain
 
@@ -202,7 +209,8 @@ const securityHeaders = [
 ### Primary (HIGH confidence)
 - [otplib npm](https://www.npmjs.com/package/otplib) - Checked version and features.
 - [Next.js Security Docs](https://nextjs.org/docs/app/building-your-application/configuring/content-security-policy) - Verified CSP patterns. [CITED: nextjs.org]
-- [Kite Metric 2FA Guide](https://kitemetric.com/blogs/boost-next-js-14-security-implement-two-factor-authentication) - Verified Next.js 14 implementation details. [CITED: kitemetric.com]
+- [Vitest Docs](https://vitest.dev/guide/) - Verified configuration and migration.
+- [Playwright Docs](https://playwright.dev/docs/intro) - Verified E2E setup for Next.js.
 
 ### Secondary (MEDIUM confidence)
 - [Prisma Field Encryption Guide](https://www.npmjs.com/package/prisma-field-encryption) - Verified encryption patterns.
