@@ -53,6 +53,7 @@ model User {
   isEmailVerified       Boolean         @default(false) // Must verify before accessing portal
   totpSecret            String? // 2FA secret (null until enrolled)
   totpEnabled           Boolean         @default(false)
+  twoFactorBackupCodes  String[] // Backup codes for 2FA recovery
   lastLoginAttemptAt    DateTime? // Trace: timestamp of most recent login attempt
   lastSuccessfulLoginAt DateTime? // Trace: timestamp of last successful login
   createdAt             DateTime        @default(now())
@@ -133,7 +134,7 @@ model Ticket {
   id             String       @id @default(uuid())
   userId         String
   assigneeUserId String? // Admin/agent handling this ticket (nullable until assigned)
-  assignee       User?        @relation("TicketAssignee", fields: [assigneeUserId], references: [id])
+  assigneeUser   User?        @relation("TicketAssignee", fields: [assigneeUserId], references: [id])
   type           TicketType
   status         TicketStatus @default(PENDING)
   content        String
