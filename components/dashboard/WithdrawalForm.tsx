@@ -91,7 +91,7 @@ export function WithdrawalForm({ availableBalance, is2faEnabled }: WithdrawalFor
       <Card className="w-full max-w-md mx-auto">
         <CardHeader>
           <CardTitle>Two-Factor Authentication</CardTitle>
-          <CardDescription>
+          <CardDescription className="text-gray-400">
             Additional verification required for withdrawal.
           </CardDescription>
         </CardHeader>
@@ -111,17 +111,17 @@ export function WithdrawalForm({ availableBalance, is2faEnabled }: WithdrawalFor
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
         <CardTitle>Request Withdrawal</CardTitle>
-        <CardDescription>
+        <CardDescription className="text-gray-400">
           Transfer funds from your available balance to your linked account.
         </CardDescription>
       </CardHeader>
       <CardContent>
         {!is2faEnabled && (
-          <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg flex items-start space-x-3">
-            <ShieldAlert className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
+          <div className="mb-6 p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl flex items-start space-x-3">
+            <ShieldAlert className="h-5 w-5 text-amber-500 mt-0.5 flex-shrink-0" />
             <div>
-              <p className="text-sm font-medium text-amber-800">2FA Not Enabled</p>
-              <p className="text-xs text-amber-700">
+              <p className="text-sm font-medium text-amber-500">2FA Not Enabled</p>
+              <p className="text-xs text-amber-500/80">
                 For security, we recommend enabling Two-Factor Authentication before making withdrawals.
                 <a href="/dashboard/settings" className="ml-1 font-semibold underline">Go to Settings</a>
               </p>
@@ -132,13 +132,13 @@ export function WithdrawalForm({ availableBalance, is2faEnabled }: WithdrawalFor
         <form id="withdrawal-form" onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <div className="flex justify-between">
-              <Label htmlFor="amount">Amount (USD)</Label>
-              <span className="text-xs text-gray-500">
+              <Label htmlFor="amount" className="text-white">Amount (USD)</Label>
+              <span className="text-xs text-gray-400">
                 Available: ${availableBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </span>
             </div>
             <div className="relative">
-              <span className="absolute left-3 top-2.5 text-gray-500">$</span>
+              <span className="absolute left-3 top-2.5 text-gray-400">$</span>
               <Input
                 id="amount"
                 type="number"
@@ -147,7 +147,7 @@ export function WithdrawalForm({ availableBalance, is2faEnabled }: WithdrawalFor
                 placeholder="0.00"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className="pl-7"
+                className="pl-7 bg-white/5 border-white/10 text-white placeholder:text-gray-500"
                 disabled={loading}
                 required
               />
@@ -155,14 +155,14 @@ export function WithdrawalForm({ availableBalance, is2faEnabled }: WithdrawalFor
           </div>
 
           {error && (
-            <div className="p-3 bg-red-50 border border-red-200 rounded-md flex items-center space-x-2 text-red-700 text-sm">
+            <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center space-x-2 text-red-500 text-sm">
               <AlertCircle className="h-4 w-4" />
               <span>{error}</span>
             </div>
           )}
 
           {success && (
-            <div className="p-3 bg-green-50 border border-green-200 rounded-md flex items-center space-x-2 text-green-700 text-sm">
+            <div className="p-3 bg-green-500/10 border border-green-500/20 rounded-xl flex items-center space-x-2 text-green-500 text-sm">
               <CheckCircle2 className="h-4 w-4" />
               <span>{success}</span>
             </div>
@@ -173,7 +173,7 @@ export function WithdrawalForm({ availableBalance, is2faEnabled }: WithdrawalFor
         <Button
           type="submit"
           form="withdrawal-form"
-          className="w-full"
+          className="w-full bg-gradient-to-r from-design-pink to-design-purple text-white hover:opacity-90 border-none"
           disabled={loading || !amount || parseFloat(amount) <= 0}
         >
           {loading ? (

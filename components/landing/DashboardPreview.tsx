@@ -13,28 +13,40 @@ const DashboardPreview = () => {
   }, []);
 
   return (
-    <div className="bg-design-surface rounded-2xl p-6 shadow-xl max-w-4xl mx-auto my-12 border border-white/5">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-bold text-white">Your Savings Dashboard</h2>
-        <div className="text-green-400 font-medium flex items-center">
-          <span className="mr-1">+$12.50 today</span>
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-          </svg>
-        </div>
-      </div>
+    <div className="bg-design-surface p-6 rounded-2xl shadow-xl border border-white/5">
+      <h2 className="mb-4 text-lg font-semibold text-white">Your Dashboard</h2>
 
-      <div className="grid md:grid-cols-3 gap-6">
-        <div className="bg-design-card p-6 rounded-xl">
-          <p className="text-sm text-gray-400 mb-2">Total Saved</p>
-          <p className="text-3xl font-bold text-white">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="bg-design-card p-4 rounded-lg">
+          <p className="text-sm text-gray-400">Saved</p>
+          <p className="text-design-pink font-bold">
             ${(balance / 100).toLocaleString(undefined, { minimumFractionDigits: 2 })}
           </p>
         </div>
 
-        <div className="bg-design-card p-6 rounded-xl md:col-span-2">
-          <p className="text-sm text-gray-400 mb-2">Savings Growth</p>
-          <div className="h-32 bg-gradient-to-r from-design-purple to-design-pink rounded-lg opacity-40"></div>
+        <div className="bg-design-card p-4 rounded-lg">
+          <p className="text-sm text-gray-400">This Month</p>
+          <p className="text-green-400">+$52.30</p>
+        </div>
+
+        <div className="bg-design-card p-4 rounded-lg">
+          <p className="text-sm text-gray-400">Payout</p>
+          <p className="text-white font-medium">$128.50</p>
+        </div>
+      </div>
+
+      {/* fake graph */}
+      <div className="mt-6 h-32 bg-gradient-to-r from-design-purple to-design-pink rounded-lg opacity-60"></div>
+
+      {/* activity */}
+      <div className="mt-4 space-y-2">
+        <div className="bg-design-card p-3 rounded flex justify-between items-center text-sm">
+          <span className="text-gray-300">Cashback</span>
+          <span className="text-green-400 font-medium">+$0.32</span>
+        </div>
+        <div className="bg-design-card p-3 rounded flex justify-between items-center text-sm">
+          <span className="text-gray-300">Cashback</span>
+          <span className="text-green-400 font-medium">+$0.18</span>
         </div>
       </div>
     </div>

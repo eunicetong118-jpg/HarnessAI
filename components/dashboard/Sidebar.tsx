@@ -17,11 +17,13 @@ export const Sidebar = () => {
   const pathname = usePathname();
 
   return (
-    <aside className="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col">
+    <aside className="w-64 bg-design-surface border-r border-white/5 hidden md:flex flex-col">
       <div className="p-6">
-        <span className="text-2xl font-bold text-blue-600">RebatePortal</span>
+        <span className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-design-pink to-design-purple">
+          Rebatengine
+        </span>
       </div>
-      <nav className="flex-1 px-4 space-y-1">
+      <nav className="flex-1 px-4 space-y-2 mt-4">
         {navigation.map((item) => {
           const isActive = pathname === item.href;
           return (
@@ -29,26 +31,26 @@ export const Sidebar = () => {
               key={item.name}
               href={item.href}
               className={cn(
-                'flex items-center px-4 py-2 text-sm font-medium rounded-md transition-colors',
+                'flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200',
                 isActive
-                  ? 'bg-blue-50 text-blue-700'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  ? 'bg-white/10 text-white shadow-lg shadow-black/20'
+                  : 'text-gray-400 hover:bg-white/5 hover:text-white'
               )}
             >
               <item.icon
-                className={cn('mr-3 h-5 w-5', isActive ? 'text-blue-700' : 'text-gray-400')}
+                className={cn('mr-3 h-5 w-5', isActive ? 'text-design-pink' : 'text-gray-500')}
               />
               {item.name}
             </Link>
           );
         })}
       </nav>
-      <div className="p-4 border-t border-gray-200">
+      <div className="p-4 border-t border-white/5">
         <button
-          className="flex items-center w-full px-4 py-2 text-sm font-medium text-gray-600 rounded-md hover:bg-gray-50 hover:text-gray-900"
+          className="flex items-center w-full px-4 py-3 text-sm font-medium text-gray-400 rounded-xl hover:bg-white/5 hover:text-white transition-all duration-200"
           onClick={() => signOut({ callbackUrl: '/login' })}
         >
-          <LogOut className="mr-3 h-5 w-5 text-gray-400" />
+          <LogOut className="mr-3 h-5 w-5 text-gray-500" />
           Sign Out
         </button>
       </div>

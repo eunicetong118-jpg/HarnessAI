@@ -64,42 +64,42 @@ export function UserTable({ users }: UserTableProps) {
 
   return (
     <div className="overflow-x-auto">
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
+      <table className="min-w-full divide-y divide-white/10">
+        <thead className="bg-white/5">
           <tr>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Balance</th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
-            <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">User</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Balance</th>
+            <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Joined</th>
+            <th className="px-6 py-3 text-right text-xs font-medium text-gray-400 uppercase tracking-wider">Actions</th>
           </tr>
         </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
+        <tbody className="bg-design-card divide-y divide-white/10">
           {users.map((user) => (
-            <tr key={user.id}>
+            <tr key={user.id} className="hover:bg-white/5 transition-colors">
               <td className="px-6 py-4 whitespace-nowrap">
-                <div className="text-sm font-medium text-gray-900">{user.name}</div>
-                <div className="text-sm text-gray-500">{user.email}</div>
-                <div className="text-xs text-gray-400">{user.role}</div>
+                <div className="text-sm font-medium text-white">{user.name}</div>
+                <div className="text-sm text-gray-400">{user.email}</div>
+                <div className="text-xs text-gray-500">{user.role}</div>
               </td>
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="flex flex-col space-y-1">
                   <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full w-fit ${
-                    user.isDisabled ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
+                    user.isDisabled ? 'bg-red-500/10 text-red-500' : 'bg-green-500/10 text-green-500'
                   }`}>
                     {user.isDisabled ? 'Disabled' : 'Enabled'}
                   </span>
                   <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full w-fit ${
-                    user.isEmailVerified ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'
+                    user.isEmailVerified ? 'bg-design-pink/10 text-design-pink' : 'bg-amber-500/10 text-amber-500'
                   }`}>
                     {user.isEmailVerified ? 'Verified' : 'Unverified'}
                   </span>
                 </div>
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-white font-medium">
                 ${user.balance}
               </td>
-              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
                 {format(new Date(user.createdAt), 'MMM dd, yyyy')}
               </td>
               <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium space-x-2">
@@ -109,6 +109,7 @@ export function UserTable({ users }: UserTableProps) {
                     size="sm"
                     onClick={() => handleResendVerification(user.id)}
                     disabled={loading === `resend-${user.id}`}
+                    className="border-white/10 hover:bg-white/5 text-white"
                   >
                     Resend Email
                   </Button>
@@ -118,6 +119,7 @@ export function UserTable({ users }: UserTableProps) {
                   size="sm"
                   onClick={() => handleToggleStatus(user.id)}
                   disabled={loading === user.id}
+                  className={user.isDisabled ? 'bg-design-pink text-white hover:bg-design-pink/90 border-none' : 'bg-red-600 text-white hover:bg-red-700 border-none'}
                 >
                   {user.isDisabled ? 'Enable' : 'Disable'}
                 </Button>

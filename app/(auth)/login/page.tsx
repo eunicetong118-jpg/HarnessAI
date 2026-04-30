@@ -36,18 +36,35 @@ export default function LoginPage() {
     const password = formData.get("password") as string;
 
     try {
+      console.log("Attempting login for:", email);
       const result = await signIn("credentials", {
         email,
         password,
         redirect: false,
       });
 
+      console.log("Login result:", result);
+
       if (result?.error) {
+        console.error("Login error from NextAuth:", result.error);
         setError("Invalid email or password");
       } else {
-        router.push("/dashboard");
+        console.log("Login success, checking role for redirect");
+        // Fetch session to check role
+        const sessionRes = await fetch("/api/auth/session");
+        const session = await sessionRes.json();
+        console.log("Current session:", session);
+
+        if (session?.user?.role === "ADMIN") {
+          console.log("Admin role detected, redirecting to /admin");
+          window.location.href = "/admin";
+        } else {
+          console.log("User role detected, redirecting to /dashboard");
+          window.location.href = "/dashboard";
+        }
       }
     } catch (err: any) {
+      console.error("Unexpected login catch block:", err);
       setError("An unexpected error occurred. Please try again.");
     } finally {
       setIsLoading(false);
@@ -55,7 +72,7 @@ export default function LoginPage() {
   };
 
   return (
-    <Card className="bg-[#12121A] border-zinc-800 text-white shadow-xl">
+    <Card className="bg-design-card border-white/5 text-white shadow-xl">
       <div className="space-y-6">
         <div className="space-y-2 text-center">
           <h1 className="text-2xl font-bold">Welcome Back</h1>
@@ -102,12 +119,12 @@ export default function LoginPage() {
             />
           </div>
 
-          <Button
-            type="submit"
-            className="w-full bg-white text-black hover:bg-zinc-200 mt-4"
-            disabled={isLoading}
-            isLoading={isLoading}
-          >
+            <Button
+              type="submit"
+              className="w-full bg-gradient-to-r from-design-pink to-design-purple text-white hover:opacity-90 mt-4 border-none"
+              disabled={isLoading}
+              isLoading={isLoading}
+            >
             Log In
           </Button>
 

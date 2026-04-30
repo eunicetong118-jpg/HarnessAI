@@ -26,6 +26,7 @@ model User {
   ledger                Ledger[]
   notifications         Notification[]
   tickets               Ticket[]        @relation("TicketCreator")
+  assignedTickets       Ticket[]        @relation("TicketAssignee")
 }
 
 model BrokerAccount {
@@ -68,6 +69,7 @@ model Ticket {
   lastModifiedAt DateTime     @updatedAt
   closedAt       DateTime?
   user           User         @relation("TicketCreator", fields: [userId], references: [id])
+  assigneeUser   User?        @relation("TicketAssignee", fields: [assigneeUserId], references: [id])
 
   @@index([userId])
 }

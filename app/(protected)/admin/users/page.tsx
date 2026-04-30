@@ -19,13 +19,13 @@ export default async function UsersPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900">User Management</h2>
-        <div className="text-sm text-gray-500">
+        <h2 className="text-2xl font-bold text-white">User Management</h2>
+        <div className="text-sm text-gray-400">
           Total Users: {users.length}
         </div>
       </div>
 
-      <div className="bg-white shadow rounded-lg">
+      <div className="bg-design-card shadow-xl rounded-xl border border-white/5 overflow-hidden">
         <UserTable users={serializedUsers as any} />
       </div>
     </div>

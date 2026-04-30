@@ -23,19 +23,19 @@ export default async function TicketsPage({
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Ticket Command Center</h2>
-          <p className="text-sm text-gray-500">Manage user verification and withdrawal requests</p>
+          <h2 className="text-2xl font-bold text-white">Ticket Command Center</h2>
+          <p className="text-sm text-gray-400">Manage user verification and withdrawal requests</p>
         </div>
         {activeTab === 'VERIFICATION' && <BulkVerifyDialog />}
       </div>
 
-      <div className="flex border-b border-gray-200">
+      <div className="flex border-b border-white/10">
         <a
           href="?tab=VERIFICATION"
           className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
             activeTab === 'VERIFICATION'
-              ? 'border-blue-500 text-blue-600'
-              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              ? 'border-design-pink text-design-pink'
+              : 'border-transparent text-gray-400 hover:text-white hover:border-gray-600'
           }`}
         >
           Verifications
@@ -44,15 +44,15 @@ export default async function TicketsPage({
           href="?tab=WITHDRAWAL"
           className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
             activeTab === 'WITHDRAWAL'
-              ? 'border-blue-500 text-blue-600'
-              : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+              ? 'border-design-pink text-design-pink'
+              : 'border-transparent text-gray-400 hover:text-white hover:border-gray-600'
           }`}
         >
           Withdrawals
         </a>
       </div>
 
-      <div className="bg-white shadow rounded-lg overflow-hidden">
+      <div className="bg-design-card shadow-xl rounded-xl overflow-hidden border border-white/5">
         <TicketTable tickets={tickets as any} currentAdminId={currentAdminId} />
       </div>
     </div>

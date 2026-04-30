@@ -19,8 +19,8 @@ export default async function DashboardPage() {
     <div className="max-w-7xl mx-auto space-y-8">
       <MilestoneTrigger totalEarned={balance.totalEarned} />
       <div>
-        <h2 className="text-2xl font-bold text-gray-900">Dashboard</h2>
-        <p className="text-sm text-gray-500">
+        <h2 className="text-2xl font-bold text-white">Dashboard</h2>
+        <p className="text-sm text-gray-400">
           Welcome back, {session?.user?.name}. Here's what's happening with your accounts.
         </p>
       </div>

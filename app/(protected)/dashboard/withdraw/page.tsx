@@ -26,8 +26,8 @@ export default async function WithdrawPage() {
   return (
     <div className="max-w-7xl mx-auto space-y-8">
       <div>
-        <h2 className="text-2xl font-bold text-gray-900">Withdrawals</h2>
-        <p className="text-sm text-gray-500">
+        <h2 className="text-2xl font-bold text-white">Withdrawals</h2>
+        <p className="text-sm text-gray-400">
           Request funds from your earnings and view your history.
         </p>
       </div>
@@ -47,13 +47,13 @@ export default async function WithdrawPage() {
             </CardHeader>
             <CardContent>
               {history.length === 0 ? (
-                <div className="text-center py-12 text-gray-500">
+                <div className="text-center py-12 text-gray-400">
                   <p>No withdrawal requests found.</p>
                 </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm text-left">
-                    <thead className="text-xs text-gray-700 uppercase bg-gray-50">
+                    <thead className="text-xs text-gray-400 uppercase bg-white/5">
                       <tr>
                         <th className="px-4 py-3">Date</th>
                         <th className="px-4 py-3">Amount</th>
@@ -61,25 +61,25 @@ export default async function WithdrawPage() {
                         <th className="px-4 py-3">Details</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-200">
+                    <tbody className="divide-y divide-white/10">
                       {history.map((ticket) => (
-                        <tr key={ticket.id}>
+                        <tr key={ticket.id} className="hover:bg-white/5 transition-colors">
                           <td className="px-4 py-3">
                             {new Date(ticket.createdAt).toLocaleDateString()}
                           </td>
-                          <td className="px-4 py-3 font-medium">
+                          <td className="px-4 py-3 font-medium text-white">
                             ${(Number((ticket.metadata as any)?.amount || 0) / 100).toFixed(2)}
                           </td>
                           <td className="px-4 py-3">
                             <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                              ticket.status === 'PENDING' ? 'bg-amber-100 text-amber-800' :
-                              ticket.status === 'DONE' ? 'bg-green-100 text-green-800' :
-                              'bg-gray-100 text-gray-800'
+                              ticket.status === 'PENDING' ? 'bg-amber-500/10 text-amber-500' :
+                              ticket.status === 'DONE' ? 'bg-green-500/10 text-green-500' :
+                              'bg-gray-500/10 text-gray-400'
                             }`}>
                               {ticket.status}
                             </span>
                           </td>
-                          <td className="px-4 py-3 text-gray-500">
+                          <td className="px-4 py-3 text-gray-400">
                             {ticket.content}
                           </td>
                         </tr>

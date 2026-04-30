@@ -17,7 +17,13 @@ async function main() {
   });
 
   if (admin) {
-    console.log(`Admin found: ${admin.email}`);
+    console.log('Admin details:', JSON.stringify({
+      email: admin.email,
+      role: admin.role,
+      isDisabled: admin.isDisabled,
+      isEmailVerified: admin.isEmailVerified,
+      totpEnabled: admin.totpEnabled
+    }, null, 2));
   } else {
     console.log('No admin found');
   }

@@ -7,7 +7,7 @@ import { SessionProvider } from "@/components/providers/SessionProvider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Rebate Portal",
+  title: "Rebatengine",
   description: "High-performance brokerage rebate portal",
 };
 
@@ -18,7 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={`${inter.className} bg-design-bg text-white min-h-screen`}>
         <SessionProvider>
           {children}
         </SessionProvider>

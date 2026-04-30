@@ -18,6 +18,7 @@
     "@prisma/client": "latest",
     "bcryptjs": "^3.0.3",
     "clsx": "^2.1.0",
+    "date-fns": "^4.1.0",
     "dotenv": "^17.4.2",
     "framer-motion": "^11.0.28",
     "html-to-image": "^1.11.11",

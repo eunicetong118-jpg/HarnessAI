@@ -36,3 +36,6 @@ generated/prisma
 venv/
 venv311/
 node_modules/
+.gstack/
+.next/
+.design-audit-tmp/

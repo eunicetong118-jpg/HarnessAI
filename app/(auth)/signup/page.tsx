@@ -62,7 +62,7 @@ export default function SignupPage() {
   };
 
   return (
-    <Card className="bg-[#12121A] border-zinc-800 text-white shadow-xl">
+    <Card className="bg-design-card border-white/5 text-white shadow-xl">
       <div className="space-y-6">
         <div className="space-y-2 text-center">
           <h1 className="text-2xl font-bold">Create Account</h1>
@@ -132,7 +132,7 @@ export default function SignupPage() {
 
           <Button
             type="submit"
-            className="w-full bg-white text-black hover:bg-zinc-200 mt-4"
+            className="w-full bg-gradient-to-r from-design-pink to-design-purple text-white hover:opacity-90 mt-4 border-none"
             disabled={isLoading}
             isLoading={isLoading}
           >

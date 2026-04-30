@@ -27,7 +27,7 @@ export const RebateChart = ({ data }: RebateChartProps) => {
   if (!mounted) {
     return (
       <Card title="Earnings Overview">
-        <div className="h-[350px] w-full bg-gray-50 animate-pulse rounded-md" />
+        <div className="h-[350px] w-full bg-white/5 animate-pulse rounded-md" />
       </Card>
     );
   }
@@ -47,11 +47,11 @@ export const RebateChart = ({ data }: RebateChartProps) => {
           >
             <defs>
               <linearGradient id="colorRebate" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.1} />
-                <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                <stop offset="5%" stopColor="#ec4899" stopOpacity={0.2} />
+                <stop offset="95%" stopColor="#ec4899" stopOpacity={0} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#ffffff10" />
             <XAxis
               dataKey="date"
               axisLine={false}
@@ -75,11 +75,13 @@ export const RebateChart = ({ data }: RebateChartProps) => {
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: '#fff',
-                border: 'none',
-                borderRadius: '8px',
-                boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
+                backgroundColor: '#1e183d',
+                border: '1px solid rgba(255,255,255,0.1)',
+                borderRadius: '12px',
+                boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.5)',
               }}
+              itemStyle={{ color: '#fff' }}
+              labelStyle={{ color: '#9ca3af' }}
               formatter={(value: number) => [`$${value.toFixed(2)}`, 'Earnings']}
               labelFormatter={(label) => {
                 try {
@@ -93,7 +95,7 @@ export const RebateChart = ({ data }: RebateChartProps) => {
             <Area
               type="monotone"
               dataKey="rebate"
-              stroke="#3b82f6"
+              stroke="#ec4899"
               strokeWidth={3}
               fillOpacity={1}
               fill="url(#colorRebate)"
