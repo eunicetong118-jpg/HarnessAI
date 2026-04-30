@@ -1,6 +1,7 @@
 import prisma from '@/lib/prisma';
 import * as XLSX from 'xlsx';
 import { z } from 'zod';
+import * as LedgerService from './ledger.service';
 
 /**
  * Zod schema for trade log row validation.
@@ -167,17 +168,10 @@ export class RebateService {
         })),
       });
 
-      // b. Insert aggregated Ledger entries
+      // b. Insert aggregated Ledger entries using LedgerService
       for (const [userId, amount] of Array.from(userAggregates.entries())) {
-        await tx.ledger.create({
-          data: {
-            userId,
-            amount,
-            type: 'CREDIT',
-            category: 'REBATE',
-            referenceId: `BATCH-${new Date().toISOString().split('T')[0]}-${userId}-${Date.now()}`,
-          },
-        });
+        const referenceId = `BATCH-${new Date().toISOString().split('T')[0]}-${userId}-${Date.now()}`;
+        await LedgerService.recordRebateCredit(userId, amount, referenceId, tx);
       }
     });
 

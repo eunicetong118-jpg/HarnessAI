@@ -1,18 +1,20 @@
-import prisma from '@/lib/prisma';
+import prisma, { DB } from '@/lib/prisma';
 
 /**
  * Gets the balance summary for a user.
  * Returns amounts in cents (BigInt).
  *
  * @param userId - The ID of the user
+ * @param tx - Optional transaction client
  * @returns { totalEarned: bigint, available: bigint, pending: bigint }
  */
-export async function getBalance(userId: string) {
+export async function getBalance(userId: string, tx?: DB) {
+  const db = tx || prisma;
   // Aggregate ledger entries by type and category
   // EntryType: CREDIT, DEBIT
   // Category: REBATE, WITHDRAWAL, FEE
 
-  const aggregate = await prisma.ledger.groupBy({
+  const aggregate = await db.ledger.groupBy({
     by: ['type', 'category'],
     where: { userId },
     _sum: {
@@ -52,10 +54,50 @@ export async function getBalance(userId: string) {
 }
 
 /**
- * Inserts a credit entry into the ledger.
+ * Records a rebate credit for a user.
  */
-export async function insertCredit(userId: string, amount: bigint, category: 'REBATE' | 'FEE', referenceId?: string) {
-  return await prisma.ledger.create({
+export async function recordRebateCredit(userId: string, amount: bigint, referenceId?: string, tx?: DB) {
+  return await (tx || prisma).ledger.create({
+    data: {
+      userId,
+      amount,
+      type: 'CREDIT',
+      category: 'REBATE',
+      referenceId: referenceId || `REB-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+    },
+  });
+}
+
+/**
+ * Executes a withdrawal debit for a user.
+ * Validates available balance first.
+ */
+export async function executeWithdrawalDebit(userId: string, amount: bigint, referenceId: string, tx?: DB) {
+  const db = tx || prisma;
+
+  // Validate balance
+  const { available } = await getBalance(userId, db);
+  if (available < amount) {
+    throw new Error('Insufficient funds');
+  }
+
+  return await db.ledger.create({
+    data: {
+      userId,
+      amount,
+      type: 'DEBIT',
+      category: 'WITHDRAWAL',
+      referenceId,
+    },
+  });
+}
+
+/**
+ * Inserts a credit entry into the ledger.
+ * @deprecated Use recordRebateCredit for rebates.
+ */
+export async function insertCredit(userId: string, amount: bigint, category: 'REBATE' | 'FEE', referenceId?: string, tx?: DB) {
+  return await (tx || prisma).ledger.create({
     data: {
       userId,
       amount,
@@ -68,9 +110,10 @@ export async function insertCredit(userId: string, amount: bigint, category: 'RE
 
 /**
  * Inserts a debit entry into the ledger.
+ * @deprecated Use executeWithdrawalDebit for withdrawals.
  */
-export async function insertDebit(userId: string, amount: bigint, category: 'WITHDRAWAL' | 'FEE', referenceId?: string) {
-  return await prisma.ledger.create({
+export async function insertDebit(userId: string, amount: bigint, category: 'WITHDRAWAL' | 'FEE', referenceId?: string, tx?: DB) {
+  return await (tx || prisma).ledger.create({
     data: {
       userId,
       amount,
@@ -84,17 +127,18 @@ export async function insertDebit(userId: string, amount: bigint, category: 'WIT
 /**
  * Gets paginated ledger history for a user.
  */
-export async function getHistory(userId: string, page: number = 1, pageSize: number = 10) {
+export async function getHistory(userId: string, page: number = 1, pageSize: number = 10, tx?: DB) {
+  const db = tx || prisma;
   const skip = (page - 1) * pageSize;
 
   const [items, total] = await Promise.all([
-    prisma.ledger.findMany({
+    db.ledger.findMany({
       where: { userId },
       orderBy: { createdAt: 'desc' },
       skip,
       take: pageSize,
     }),
-    prisma.ledger.count({
+    db.ledger.count({
       where: { userId },
     }),
   ]);

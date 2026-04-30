@@ -1,8 +1,9 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { createWithdrawal, getWithdrawalHistory } from '@/services/withdrawal.service';
 import prisma from '@/lib/prisma';
-import { getBalance } from '@/services/ledger.service';
+import * as LedgerService from '@/services/ledger.service';
 import { SecurityService } from '@/services/security.service';
+import * as TicketService from '@/services/ticket.service';
 
 vi.mock('@/lib/prisma', () => ({
   default: {
@@ -26,6 +27,11 @@ vi.mock('@/lib/prisma', () => ({
 
 vi.mock('@/services/ledger.service', () => ({
   getBalance: vi.fn(),
+  executeWithdrawalDebit: vi.fn(),
+}));
+
+vi.mock('@/services/ticket.service', () => ({
+  createWithdrawalTicket: vi.fn(),
 }));
 
 vi.mock('@/services/security.service', () => ({
@@ -42,21 +48,26 @@ describe('Withdrawal Service', () => {
     (prisma.user.findUnique as any).mockResolvedValue({ id: userId, totpEnabled: false });
     // Reset transaction mock to return a fresh set of mocks each time
     (prisma.$transaction as any).mockImplementation(async (callback: any) => {
-      return callback({
+      const mockTx = {
         ticket: { create: vi.fn().mockResolvedValue({ id: 't-1' }) },
         ledger: { create: vi.fn().mockResolvedValue({ id: 'l-1' }) },
-      });
+        user: { findUnique: vi.fn().mockResolvedValue({ id: userId, totpEnabled: false }) },
+      };
+      return callback(mockTx);
     });
+
+    (TicketService.createWithdrawalTicket as any).mockResolvedValue({ id: 't-1' });
+    (LedgerService.executeWithdrawalDebit as any).mockResolvedValue({ id: 'l-1' });
   });
 
   describe('createWithdrawal', () => {
     it('creates a withdrawal ticket and ledger entry when balance is sufficient', async () => {
       const amount = BigInt(5000); // $50.00
-      (getBalance as any).mockResolvedValue({ available: BigInt(10000) });
 
       const result = await createWithdrawal(userId, amount);
 
-      expect(getBalance).toHaveBeenCalledWith(userId);
+      expect(TicketService.createWithdrawalTicket).toHaveBeenCalledWith(userId, amount, expect.anything());
+      expect(LedgerService.executeWithdrawalDebit).toHaveBeenCalledWith(userId, amount, 't-1', expect.anything());
       expect(result).toEqual({ id: 't-1' });
     });
 
@@ -78,7 +89,6 @@ describe('Withdrawal Service', () => {
       const amount = BigInt(5000);
       (prisma.user.findUnique as any).mockResolvedValue({ id: userId, totpEnabled: true });
       (SecurityService.verifySecurityCode as any).mockResolvedValue(true);
-      (getBalance as any).mockResolvedValue({ available: BigInt(10000) });
 
       const result = await createWithdrawal(userId, amount, '123456');
 
@@ -91,11 +101,11 @@ describe('Withdrawal Service', () => {
       await expect(createWithdrawal(userId, BigInt(-100))).rejects.toThrow('Amount must be greater than zero');
     });
 
-    it('throws error when balance is insufficient', async () => {
+    it('throws error when LedgerService throws insufficient funds', async () => {
       const amount = BigInt(5000);
-      (getBalance as any).mockResolvedValue({ available: BigInt(3000) });
+      (LedgerService.executeWithdrawalDebit as any).mockRejectedValue(new Error('Insufficient funds'));
 
-      await expect(createWithdrawal(userId, amount)).rejects.toThrow('Insufficient balance');
+      await expect(createWithdrawal(userId, amount)).rejects.toThrow('Insufficient funds');
     });
   });
 

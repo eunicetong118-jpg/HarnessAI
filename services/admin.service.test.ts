@@ -3,21 +3,33 @@ import * as adminService from './admin.service';
 import prisma from '@/lib/prisma';
 import * as emailVerificationService from './emailVerification.service';
 
-vi.mock('@/lib/prisma', () => ({
-  default: {
-    user: {
-      findMany: vi.fn(),
-      findUnique: vi.fn(),
-      update: vi.fn(),
+vi.mock('@/lib/prisma', () => {
+  const mockActionTokenDeleteMany = vi.fn();
+  const mockUserFindUnique = vi.fn();
+  const mockUserUpdate = vi.fn();
+  const mockUserFindMany = vi.fn();
+  const mockLedgerGroupBy = vi.fn();
+
+  return {
+    default: {
+      user: {
+        findMany: mockUserFindMany,
+        findUnique: mockUserFindUnique,
+        update: mockUserUpdate,
+      },
+      actionToken: {
+        deleteMany: mockActionTokenDeleteMany,
+      },
+      ledger: {
+        groupBy: mockLedgerGroupBy,
+      },
+      $transaction: vi.fn((callback) => callback({
+        actionToken: { deleteMany: mockActionTokenDeleteMany },
+        user: { findUnique: mockUserFindUnique, update: mockUserUpdate },
+      })),
     },
-    actionToken: {
-      deleteMany: vi.fn(),
-    },
-    ledger: {
-      groupBy: vi.fn(),
-    },
-  },
-}));
+  };
+});
 
 vi.mock('./emailVerification.service', () => ({
   sendVerificationEmail: vi.fn(),

@@ -1,15 +1,16 @@
-import prisma from '@/lib/prisma';
+import prisma, { DB } from '@/lib/prisma';
 import { sendVerificationEmail } from './emailVerification.service';
 
 /**
  * Returns a list of all users with their calculated balances.
  */
-export async function getUsers() {
-  const users = await prisma.user.findMany({
+export async function getUsers(tx?: DB) {
+  const db = tx || prisma;
+  const users = await db.user.findMany({
     orderBy: { createdAt: 'desc' },
   });
 
-  const aggregates = await prisma.ledger.groupBy({
+  const aggregates = await db.ledger.groupBy({
     by: ['userId', 'type'],
     where: {
       userId: { in: users.map((u) => u.id) },
@@ -42,15 +43,16 @@ export async function getUsers() {
 /**
  * Toggles the isDisabled status of a user.
  */
-export async function toggleUserDisabled(userId: string) {
-  const user = await prisma.user.findUnique({
+export async function toggleUserDisabled(userId: string, tx?: DB) {
+  const db = tx || prisma;
+  const user = await db.user.findUnique({
     where: { id: userId },
     select: { isDisabled: true },
   });
 
   if (!user) throw new Error('User not found');
 
-  return await prisma.user.update({
+  return await db.user.update({
     where: { id: userId },
     data: { isDisabled: !user.isDisabled },
   });
@@ -60,22 +62,34 @@ export async function toggleUserDisabled(userId: string) {
  * Manually triggers a verification email resend.
  * Invalidates any existing verification tokens for the user first.
  */
-export async function triggerManualResendVerification(userId: string) {
-  const user = await prisma.user.findUnique({
+export async function triggerManualResendVerification(userId: string, tx?: DB) {
+  const db = tx || prisma;
+  const user = await db.user.findUnique({
     where: { id: userId },
     select: { id: true, email: true },
   });
 
   if (!user) throw new Error('User not found');
 
-  // Invalidate old tokens
-  await prisma.actionToken.deleteMany({
-    where: {
-      userId,
-      tokenType: 'EMAIL_VERIFICATION',
-    },
-  });
+  const performResend = async (client: DB) => {
+    // Invalidate old tokens
+    await client.actionToken.deleteMany({
+      where: {
+        userId,
+        tokenType: 'EMAIL_VERIFICATION',
+      },
+    });
 
-  // Send new email (this creates a new token internally)
-  await sendVerificationEmail(user.id, user.email);
+    // Send new email (this creates a new token internally)
+    // Note: sendVerificationEmail would need to be updated to accept tx to be fully atomic
+    await sendVerificationEmail(user.id, user.email);
+  };
+
+  if (tx) {
+    await performResend(tx);
+  } else {
+    await prisma.$transaction(async (pTx) => {
+      await performResend(pTx);
+    });
+  }
 }

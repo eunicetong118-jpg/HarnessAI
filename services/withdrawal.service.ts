@@ -1,5 +1,6 @@
-import prisma from '@/lib/prisma';
-import { getBalance } from '@/services/ledger.service';
+import prisma, { DB } from '@/lib/prisma';
+import * as LedgerService from '@/services/ledger.service';
+import * as TicketService from '@/services/ticket.service';
 import { SecurityService } from '@/services/security.service';
 
 /**
@@ -11,15 +12,18 @@ import { SecurityService } from '@/services/security.service';
  * @param userId - The ID of the user
  * @param amount - The amount to withdraw in cents (BigInt)
  * @param securityCode - (Optional) 2FA or Backup code
+ * @param tx - Optional transaction client
  * @returns The created withdrawal ticket
  */
-export async function createWithdrawal(userId: string, amount: bigint, securityCode?: string) {
+export async function createWithdrawal(userId: string, amount: bigint, securityCode?: string, tx?: DB) {
   if (amount <= BigInt(0)) {
     throw new Error('Amount must be greater than zero');
   }
 
+  const db = tx || prisma;
+
   // 0. Verify 2FA if enabled
-  const user = await prisma.user.findUnique({
+  const user = await db.user.findUnique({
     where: { id: userId },
     select: { totpEnabled: true }
   });
@@ -34,57 +38,34 @@ export async function createWithdrawal(userId: string, amount: bigint, securityC
     }
   }
 
-  // Use a transaction to ensure atomic balance check and debit
-  return await prisma.$transaction(async (tx) => {
-    // 1. Check available balance
-    // Note: We use the injected transaction context if possible,
-    // but getBalance currently uses the global prisma client.
-    // For strict consistency, we should ideally have a version of getBalance that accepts a tx.
-    // However, since we are only doing one debit, the transaction around ticket creation and ledger entry
-    // is the most critical part for atomicity of the 'debit' itself.
+  const performWithdrawal = async (client: DB) => {
+    // 1. Create a Ticket using TicketService
+    const ticket = await TicketService.createWithdrawalTicket(userId, amount, client);
 
-    const { available } = await getBalance(userId);
-
-    if (available < amount) {
-      throw new Error('Insufficient balance');
-    }
-
-    // 2. Create a Ticket (type: WITHDRAWAL, status: PENDING)
-    const ticket = await tx.ticket.create({
-      data: {
-        userId,
-        type: 'WITHDRAWAL',
-        status: 'PENDING',
-        content: `Withdrawal request for $${Number(amount) / 100}`,
-        metadata: {
-          amount: amount.toString(),
-        },
-      },
-    });
-
-    // 3. Create a Ledger entry (type: DEBIT, category: WITHDRAWAL, referenceId: ticket.id)
-    await tx.ledger.create({
-      data: {
-        userId,
-        amount,
-        type: 'DEBIT',
-        category: 'WITHDRAWAL',
-        referenceId: ticket.id,
-      },
-    });
+    // 2. Execute Withdrawal Debit using LedgerService (includes balance check)
+    await LedgerService.executeWithdrawalDebit(userId, amount, ticket.id, client);
 
     return ticket;
-  });
+  };
+
+  if (tx) {
+    return await performWithdrawal(tx);
+  } else {
+    return await prisma.$transaction(async (pTx) => {
+      return await performWithdrawal(pTx);
+    });
+  }
 }
 
 /**
  * Gets the withdrawal history for a user.
  *
  * @param userId - The ID of the user
+ * @param tx - Optional transaction client
  * @returns Array of withdrawal tickets
  */
-export async function getWithdrawalHistory(userId: string) {
-  return await prisma.ticket.findMany({
+export async function getWithdrawalHistory(userId: string, tx?: DB) {
+  return await (tx || prisma).ticket.findMany({
     where: {
       userId,
       type: 'WITHDRAWAL',

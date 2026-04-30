@@ -1,4 +1,4 @@
-import prisma from '@/lib/prisma';
+import prisma, { DB } from '@/lib/prisma';
 import { encrypt, decrypt } from '@/lib/security/crypto';
 import { generateSecret, generateKeyuri, verifyToken, generateBackupCodes } from '@/lib/totp';
 import QRCode from 'qrcode';
@@ -9,8 +9,9 @@ export class SecurityService {
    * Generates a new TOTP secret for a user and saves it (encrypted).
    * Returns the QR code data URL.
    */
-  static async generateSetup(userId: string) {
-    const user = await prisma.user.findUnique({
+  static async generateSetup(userId: string, tx?: DB) {
+    const db = tx || prisma;
+    const user = await db.user.findUnique({
       where: { id: userId },
       select: { email: true }
     });
@@ -21,7 +22,7 @@ export class SecurityService {
     const encryptedSecret = encrypt(secret);
 
     // Save encrypted secret immediately (totpEnabled: false)
-    await prisma.user.update({
+    await db.user.update({
       where: { id: userId },
       data: {
         totpSecret: encryptedSecret,
@@ -39,8 +40,9 @@ export class SecurityService {
    * Verifies the provided token and enables 2FA for the user.
    * Generates backup codes upon successful enablement.
    */
-  static async verifyAndEnable(userId: string, token: string) {
-    const user = await prisma.user.findUnique({
+  static async verifyAndEnable(userId: string, token: string, tx?: DB) {
+    const db = tx || prisma;
+    const user = await db.user.findUnique({
       where: { id: userId },
       select: { totpSecret: true }
     });
@@ -62,7 +64,7 @@ export class SecurityService {
     );
 
     // Enable 2FA and store hashed backup codes
-    await prisma.user.update({
+    await db.user.update({
       where: { id: userId },
       data: {
         totpEnabled: true,
@@ -77,8 +79,9 @@ export class SecurityService {
    * Regenerates backup codes for a user.
    * Invalidates any existing backup codes.
    */
-  static async regenerateBackupCodes(userId: string) {
-    const user = await prisma.user.findUnique({
+  static async regenerateBackupCodes(userId: string, tx?: DB) {
+    const db = tx || prisma;
+    const user = await db.user.findUnique({
       where: { id: userId },
       select: { totpEnabled: true }
     });
@@ -92,7 +95,7 @@ export class SecurityService {
       plainCodes.map(code => bcrypt.hash(code, 10))
     );
 
-    await prisma.user.update({
+    await db.user.update({
       where: { id: userId },
       data: {
         twoFactorBackupCodes: hashedCodes
@@ -106,8 +109,9 @@ export class SecurityService {
    * Verifies a security code (TOTP or Backup Code).
    * If it's a backup code, it is consumed (removed from the user's list).
    */
-  static async verifySecurityCode(userId: string, code: string): Promise<boolean> {
-    const user = await prisma.user.findUnique({
+  static async verifySecurityCode(userId: string, code: string, tx?: DB): Promise<boolean> {
+    const db = tx || prisma;
+    const user = await db.user.findUnique({
       where: { id: userId },
       select: {
         totpSecret: true,
@@ -137,7 +141,7 @@ export class SecurityService {
     for (const hashedCode of user.twoFactorBackupCodes) {
       if (await bcrypt.compare(code, hashedCode)) {
         // Consume backup code: remove this hash
-        await prisma.user.update({
+        await db.user.update({
           where: { id: userId },
           data: {
             twoFactorBackupCodes: {
