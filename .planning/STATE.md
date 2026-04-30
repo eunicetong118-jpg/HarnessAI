@@ -2,35 +2,35 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: completed
-last_updated: "2026-04-30T02:40:52.055Z"
+status: Not started
+last_updated: "2026-04-30T03:04:12.081Z"
 progress:
   total_phases: 5
   completed_phases: 2
-  total_plans: 10
-  completed_plans: 7
-  percent: 70
+  total_plans: 14
+  completed_plans: 8
+  percent: 57
 ---
 
 # State
 
-## Active Milestone: Phase 2
+## Active Milestone: Phase 4
 
 ## Status: In Progress
 
-## Current Task: Initialize Phase 2 Plans
+## Current Task: Initialize Phase 4 Plans
 
 ## Current Position
 
-Phase: 03-rebate-engine
-Plan: 03
-Status: Completed
-Progress: [███████░░░] 70%
+Phase: 04-admin-financials
+Plan: TBD
+Status: Not started
+Progress: [██████░░░░] 57%
 
 ## Performance Metrics
 
-- Requirements Covered: 5/10 (v1 Core)
-- Phases Completed: 1/5
+- Requirements Covered: 15/21 (v1 Core)
+- Phases Completed: 3/5
 - System Health: Optimal
 
 ## Completed Tasks
@@ -40,6 +40,12 @@ Progress: [███████░░░] 70%
 - [x] Middleware Guards (2026-04-29)
 - [x] NextAuth v5 Configuration (2026-04-30)
 - [x] Registration API Integration (2026-04-30)
+- [x] Dashboard Layout & Navigation (2026-04-30)
+- [x] Recharts Integration (2026-04-30)
+- [x] MT5 Linkage & Onboarding (2026-04-30)
+- [x] Trade Ingestion Service (2026-04-30)
+- [x] 80% Rebate Calculation Engine (2026-04-30)
+- [x] Atomic Ledger Deduplication (2026-04-30)
 
 ## Blockers
 
@@ -62,18 +68,21 @@ Progress: [███████░░░] 70%
 - Implemented 80% rebate formula with BigInt precision.
 - Used ProcessedTrade model for atomic trade deduplication.
 - Aggregated batch rebates per user to minimize ledger noise.
-- Archiving processed trade logs in cron route for audit and hygiene
-- Enforcing ADMIN role check for manual trade uploads
-- Converting BigInt cents to strings for API responses
+- Archiving processed trade logs in cron route for audit and hygiene.
+- Enforcing ADMIN role check for manual trade uploads.
+- Converting BigInt cents to strings for API responses.
+- Implemented global BigInt serialization polyfill
+- Used Prisma transactions for atomic withdrawal debits
 
 ### Todos
 
-- Implement MT5 Linkage UI with IB mapping.
-- Create Dashboard layout with Recharts.
-- Add Ledger summary cards.
-- Implement amber pending banner.
+- Implement Withdrawal Ticket System.
+- Create Admin Verification Queue.
+- Build Admin Financial Dashboard.
+- Implement User Withdrawal History.
 
 ## Session Continuity
 
-- Phase 1 successfully transitioned to completed.
-- Requirements for Phase 2 updated to include Recharts and Dashboard specifics.
+- Phase 3 (Rebate Engine) successfully completed and verified.
+- Success criteria for ingestion, calculation, and aggregation met.
+- Transitioning to Phase 4: Admin & Financials.
