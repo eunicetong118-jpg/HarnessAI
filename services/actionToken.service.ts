@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import { randomBytes } from 'crypto';
 
 export async function createToken(userId: string, type: 'EMAIL_VERIFICATION' | 'PASSWORD_RESET') {
-  const rawToken = randomBytes(32).toString('hex');
+  const rawToken = randomBytes(16).toString('hex');
   const hash = await bcrypt.hash(rawToken, 12);
 
   const ttl = type === 'EMAIL_VERIFICATION' ? 24 : 1;

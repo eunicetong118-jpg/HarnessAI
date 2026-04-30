@@ -28,7 +28,7 @@ bin/
 
 ### Mac OS ###
 .DS_Store
-/src/generated/prisma
+generated/prisma
 .worktrees/
 .agents/
 .claude/
