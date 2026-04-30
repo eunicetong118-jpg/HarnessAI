@@ -19,8 +19,10 @@
 - [ ] Broker Account status management.
 
 ## 3. Rebate Engine (Phase 3)
-- [ ] REB-01: CSV/Excel Trade Ingest.
-- [ ] REB-02: ReferenceID Deduplication.
+- [x] REB-01
+: CSV/Excel Trade Ingest.
+- [x] REB-02
+: ReferenceID Deduplication.
 - [ ] REB-03: 80% Formula Calculation.
 - [ ] REB-04: Ledger Credit aggregation.
 - [ ] REB-05: Cron & Admin API Integration.
