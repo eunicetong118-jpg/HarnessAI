@@ -2,6 +2,7 @@ import { auth } from '@/lib/auth';
 import { getTickets } from '@/services/ticket.service';
 import { TicketTable } from '@/components/admin/TicketTable';
 import { TicketType } from '@/generated/prisma/client';
+import { BulkVerifyDialog } from '@/components/admin/BulkVerifyDialog';
 
 export default async function TicketsPage({
   searchParams,
@@ -25,6 +26,7 @@ export default async function TicketsPage({
           <h2 className="text-2xl font-bold text-gray-900">Ticket Command Center</h2>
           <p className="text-sm text-gray-500">Manage user verification and withdrawal requests</p>
         </div>
+        {activeTab === 'VERIFICATION' && <BulkVerifyDialog />}
       </div>
 
       <div className="flex border-b border-gray-200">
