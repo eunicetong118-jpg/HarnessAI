@@ -79,8 +79,8 @@ export class RebateService {
         }
 
         // 4. Calculate amount in cents (BigInt)
-        // volume (lots) * rebatePerLot (USD/lot) * 100 (cents/USD)
-        const amountInCents = BigInt(Math.round(validatedRow.volume * validatedRow.rebatePerLot * 100));
+        // Formula: volume (lots) * rebatePerLot (USD/lot) * 0.80 * 100 (cents/USD)
+        const amountInCents = RebateService.calculateRebate(validatedRow.volume, validatedRow.rebatePerLot);
 
         normalizedTrades.push({
           tradeId: validatedRow.tradeId,
@@ -101,5 +101,90 @@ export class RebateService {
     }
 
     return normalizedTrades;
+  }
+
+  /**
+   * Calculates the rebate amount in cents.
+   * Formula: volume * rebatePerLot * 0.80
+   *
+   * @param volume - Trade volume in lots
+   * @param rebatePerLot - Rebate rate in USD per lot
+   * @returns BigInt amount in cents
+   */
+  static calculateRebate(volume: number, rebatePerLot: number): bigint {
+    return BigInt(Math.round(volume * rebatePerLot * 0.80 * 100));
+  }
+
+  /**
+   * Processes a batch of normalized trades.
+   * Performs deduplication, aggregation per user, and ledger insertion.
+   *
+   * @param trades - List of normalized trades to process
+   * @returns Summary of processing
+   */
+  static async processBatch(trades: NormalizedTrade[]): Promise<{
+    processed: number;
+    skipped: number;
+    totalCents: bigint;
+  }> {
+    if (trades.length === 0) {
+      return { processed: 0, skipped: 0, totalCents: BigInt(0) };
+    }
+
+    // 1. Deduplication: Check for existing trade IDs
+    const tradeIds = trades.map((t) => t.tradeId);
+    const existingProcessed = await prisma.processedTrade.findMany({
+      where: { tradeId: { in: tradeIds } },
+      select: { tradeId: true },
+    });
+
+    const existingTradeIds = new Set(existingProcessed.map((p) => p.tradeId));
+    const newTrades = trades.filter((t) => !existingTradeIds.has(t.tradeId));
+    const skippedCount = trades.length - newTrades.length;
+
+    if (newTrades.length === 0) {
+      return { processed: 0, skipped: skippedCount, totalCents: BigInt(0) };
+    }
+
+    const userAggregates = new Map<string, bigint>();
+    newTrades.forEach((trade) => {
+      const current = userAggregates.get(trade.userId) || BigInt(0);
+      userAggregates.set(trade.userId, current + trade.amountInCents);
+    });
+
+    let totalCents = BigInt(0);
+    userAggregates.forEach((amount) => {
+      totalCents += amount;
+    });
+
+    // 3. Execution: Wrap in a Prisma transaction
+    await prisma.$transaction(async (tx) => {
+      // a. Insert ProcessedTrade records for audit and dedup
+      await tx.processedTrade.createMany({
+        data: newTrades.map((t) => ({
+          tradeId: t.tradeId,
+          userId: t.userId,
+        })),
+      });
+
+      // b. Insert aggregated Ledger entries
+      for (const [userId, amount] of Array.from(userAggregates.entries())) {
+        await tx.ledger.create({
+          data: {
+            userId,
+            amount,
+            type: 'CREDIT',
+            category: 'REBATE',
+            referenceId: `BATCH-${new Date().toISOString().split('T')[0]}-${userId}-${Date.now()}`,
+          },
+        });
+      }
+    });
+
+    return {
+      processed: newTrades.length,
+      skipped: skippedCount,
+      totalCents,
+    };
   }
 }
