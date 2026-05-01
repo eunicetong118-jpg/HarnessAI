@@ -4,20 +4,24 @@ import CalculatorSection from "@/components/landing/CalculatorSection";
 import StatsSection from "@/components/landing/StatsSection";
 import SocialProofSection from "@/components/landing/SocialProofSection";
 import CTASection from "@/components/landing/CTASection";
+import GoldCoinRain from "@/components/landing/GoldCoinRain";
 
 export default function Page() {
   return (
-    <main className="bg-design-bg text-white min-h-screen px-6 py-10">
-      <div className="max-w-7xl mx-auto">
+    <main className="bg-design-bg text-white min-h-screen relative overflow-hidden">
+      <GoldCoinRain />
 
-        {/* HERO + DASHBOARD */}
-        <div className="grid md:grid-cols-2 gap-12 items-center">
-          <HeroSection />
-          <DashboardPreview />
-        </div>
+      <div className="relative z-10 max-w-7xl mx-auto px-6 py-10">
+        {/* HERO */}
+        <HeroSection />
 
         {/* STATS */}
         <StatsSection />
+
+        {/* DASHBOARD PREVIEW */}
+        <div className="mt-20">
+          <DashboardPreview />
+        </div>
 
         {/* CALCULATOR */}
         <CalculatorSection />
@@ -27,7 +31,6 @@ export default function Page() {
 
         {/* BOTTOM CTA */}
         <CTASection />
-
       </div>
     </main>
   );
