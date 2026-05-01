@@ -2,7 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import Lottie from 'lottie-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Milestone } from '@/config/milestones';
+import { Button } from '@/components/ui/button';
 
 interface MilestoneCelebrationProps {
   milestone: Milestone;
@@ -14,46 +16,60 @@ export const MilestoneCelebration = ({ milestone, onComplete }: MilestoneCelebra
   const [isVisible, setIsVisible] = useState(true);
 
   useEffect(() => {
-    // Using a common confetti animation from a reliable CDN
-    fetch('https://assets9.lottiefiles.com/packages/lf20_u4yrau.json')
+    // Standard confetti animation
+    fetch('https://lottie.host/801844b2-0f0e-439b-980b-99f572458e06/8N10u3K0jH.json')
       .then((res) => res.json())
       .then((data) => setAnimationData(data))
       .catch((err) => console.error('Failed to load Lottie animation', err));
   }, []);
 
-  if (!animationData || !isVisible) return null;
+  if (!isVisible) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center pointer-events-none">
-      <div className="absolute inset-0 bg-black/20 backdrop-blur-sm pointer-events-auto" />
-      <div className="relative z-10 w-full max-w-lg p-8 bg-white rounded-2xl shadow-2xl text-center pointer-events-auto animate-in zoom-in duration-300">
-        <div className="h-48 w-48 mx-auto mb-4">
-          <Lottie
-            animationData={animationData}
-            loop={false}
-            onComplete={() => {
-              // Stay visible for a bit after animation finishes
-              setTimeout(() => {
-                setIsVisible(false);
-                onComplete?.();
-              }, 2000);
-            }}
-          />
-        </div>
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">Congratulations!</h2>
-        <p className="text-lg text-gray-600 mb-6">
-          You've reached the <span className="font-semibold text-blue-600">{milestone.label}</span> milestone!
-        </p>
-        <button
+    <AnimatePresence>
+      <div className="fixed inset-0 z-50 flex items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="absolute inset-0 bg-design-bg/60 backdrop-blur-2xl"
           onClick={() => {
             setIsVisible(false);
             onComplete?.();
           }}
-          className="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+        />
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0, y: 20 }}
+          animate={{ scale: 1, opacity: 1, y: 0 }}
+          exit={{ scale: 0.9, opacity: 0, y: 20 }}
+          className="relative z-10 w-full max-w-lg p-8 bg-design-surface border border-white/10 rounded-2xl shadow-2xl text-center"
         >
-          Awesome!
-        </button>
+          <div className="h-48 w-48 mx-auto mb-4 relative">
+            {animationData && (
+              <Lottie
+                animationData={animationData}
+                loop={true}
+                className="absolute inset-0"
+              />
+            )}
+          </div>
+          <h2 className="text-3xl font-bold text-white mb-2">Congratulations!</h2>
+          <p className="text-lg text-gray-400 mb-6">
+            You've reached the <span className="font-semibold text-design-pink">{milestone.label}</span> milestone!
+          </p>
+          <Button
+            onClick={() => {
+              setIsVisible(false);
+              onComplete?.();
+            }}
+            variant="primary"
+            size="lg"
+            className="w-full"
+          >
+            Awesome!
+          </Button>
+        </motion.div>
       </div>
-    </div>
+    </AnimatePresence>
   );
 };

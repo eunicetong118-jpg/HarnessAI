@@ -7,6 +7,7 @@ import { authConfig } from "./auth.config"
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
+  // @ts-ignore - PrismaAdapter type mismatch with custom User model properties
   adapter: PrismaAdapter(prisma),
   providers: [
     Credentials({

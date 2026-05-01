@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
@@ -8,8 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { motion } from "framer-motion";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(false);
@@ -72,22 +73,29 @@ export default function LoginPage() {
   };
 
   return (
-    <Card className="bg-design-card border-white/5 text-white shadow-xl">
-      <div className="space-y-6">
+    <Card className="bg-white/5 backdrop-blur-3xl border-white/10 text-white shadow-[0_8px_32px_0_rgba(0,0,0,0.36)] relative overflow-hidden group">
+      {/* Liquid glass light reflection */}
+      <div className="absolute -top-[50%] -left-[50%] w-[200%] h-[200%] bg-gradient-to-br from-white/10 via-transparent to-transparent rotate-12 pointer-events-none" />
+
+      <div className="space-y-6 relative z-10 p-1">
         <div className="space-y-2 text-center">
-          <h1 className="text-2xl font-bold">Welcome Back</h1>
-          <p className="text-zinc-400">Log in to your account</p>
+          <h1 className="text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-white to-white/60">Welcome Back</h1>
+          <p className="text-gray-400 font-medium">Log in to your account</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-5">
           {error && (
-            <div className="bg-red-500/10 border border-red-500 text-red-500 p-3 rounded-md text-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-xl text-sm backdrop-blur-md"
+            >
               {error}
-            </div>
+            </motion.div>
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email" className="text-gray-300 ml-1">Email</Label>
             <Input
               id="email"
               name="email"
@@ -95,16 +103,16 @@ export default function LoginPage() {
               placeholder="name@example.com"
               required
               disabled={isLoading}
-              className="bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-500 focus:border-zinc-700 focus:ring-zinc-700"
+              className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-design-pink/50 focus:ring-design-pink/20 h-12 rounded-xl transition-all duration-300"
             />
           </div>
 
           <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="password">Password</Label>
+            <div className="flex items-center justify-between ml-1">
+              <Label htmlFor="password" title="password" className="text-gray-300">Password</Label>
               <Link
                 href="/forgot-password"
-                className="text-xs text-zinc-400 hover:text-white hover:underline"
+                className="text-xs text-design-pink/80 hover:text-design-pink transition-colors font-medium"
               >
                 Forgot password?
               </Link>
@@ -115,27 +123,40 @@ export default function LoginPage() {
               type="password"
               required
               disabled={isLoading}
-              className="bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-500 focus:border-zinc-700 focus:ring-zinc-700"
+              className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-design-pink/50 focus:ring-design-pink/20 h-12 rounded-xl transition-all duration-300"
             />
           </div>
 
-            <Button
-              type="submit"
-              className="w-full bg-gradient-to-r from-design-pink to-design-purple text-white hover:opacity-90 mt-4 border-none"
-              disabled={isLoading}
-              isLoading={isLoading}
-            >
-            Log In
+          <Button
+            type="submit"
+            variant="primary"
+            size="lg"
+            className="w-full bg-gradient-to-r from-design-pink to-design-purple text-white mt-6 shadow-lg shadow-design-pink/20 relative group overflow-hidden border-none"
+            disabled={isLoading}
+            isLoading={isLoading}
+          >
+            <span className="relative z-10">Log In</span>
+            <motion.div
+              className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out"
+            />
           </Button>
 
-          <div className="text-sm text-zinc-400 text-center mt-4">
+          <div className="text-sm text-gray-400 text-center mt-6">
             Don&apos;t have an account?{" "}
-            <Link href="/signup" className="text-white hover:underline">
+            <Link href="/signup" className="text-design-pink font-semibold hover:text-design-pink/80 transition-colors">
               Sign up
             </Link>
           </div>
         </form>
       </div>
     </Card>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="text-white">Loading...</div>}>
+      <LoginForm />
+    </Suspense>
   );
 }

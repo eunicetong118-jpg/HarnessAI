@@ -3,6 +3,7 @@ import { auth } from '@/lib/auth';
 import { hasLinkedAccount, getBrokerAccounts } from '@/services/broker.service';
 import { Sidebar } from '@/components/dashboard/Sidebar';
 import { PendingBanner } from '@/components/dashboard/pending-banner';
+import { PageTransition } from '@/components/dashboard/PageTransition';
 
 export default async function DashboardLayout({
   children,
@@ -41,8 +42,10 @@ export default async function DashboardLayout({
           </div>
         </header>
         <main className="flex-1 overflow-y-auto p-8 bg-design-bg">
-          {hasPending && <PendingBanner />}
-          {children}
+          <PageTransition>
+            {hasPending && <PendingBanner />}
+            {children}
+          </PageTransition>
         </main>
       </div>
     </div>

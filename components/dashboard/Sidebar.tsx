@@ -3,9 +3,10 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Wallet, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, Wallet, Settings, LogOut, ShieldCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { signOut } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
+import { motion } from 'framer-motion';
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -15,6 +16,8 @@ const navigation = [
 
 export const Sidebar = () => {
   const pathname = usePathname();
+  const { data: session } = useSession();
+  const isAdmin = (session?.user as any)?.role === 'ADMIN';
 
   return (
     <aside className="w-64 bg-design-surface border-r border-white/5 hidden md:flex flex-col">
@@ -31,12 +34,19 @@ export const Sidebar = () => {
               key={item.name}
               href={item.href}
               className={cn(
-                'flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200',
+                'relative flex items-center px-4 py-3 text-sm font-medium rounded-xl transition-all duration-200',
                 isActive
                   ? 'bg-white/10 text-white shadow-lg shadow-black/20'
                   : 'text-gray-400 hover:bg-white/5 hover:text-white'
               )}
             >
+              {isActive && (
+                <motion.div
+                  layoutId="sidebar-active"
+                  className="absolute left-0 w-1 h-6 bg-design-pink rounded-r-full"
+                  transition={{ type: "spring", stiffness: 300, damping: 300 }}
+                />
+              )}
               <item.icon
                 className={cn('mr-3 h-5 w-5', isActive ? 'text-design-pink' : 'text-gray-500')}
               />
@@ -44,6 +54,16 @@ export const Sidebar = () => {
             </Link>
           );
         })}
+
+        {isAdmin && (
+          <Link
+            href="/admin"
+            className="flex items-center px-4 py-3 text-sm font-medium text-amber-400 rounded-xl hover:bg-amber-400/10 transition-all duration-200"
+          >
+            <ShieldCheck className="mr-3 h-5 w-5 text-amber-500" />
+            Admin Portal
+          </Link>
+        )}
       </nav>
       <div className="p-4 border-t border-white/5">
         <button

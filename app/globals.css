@@ -17,6 +17,18 @@
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: white;
+  @apply bg-design-bg text-white selection:bg-design-pink/30 selection:text-white;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-design-bg;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-design-pink/20 rounded-full border-2 border-transparent bg-clip-content hover:bg-design-pink/40 transition-colors;
 }

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { motion } from "framer-motion";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -62,39 +63,50 @@ export default function SignupPage() {
   };
 
   return (
-    <Card className="bg-design-card border-white/5 text-white shadow-xl">
-      <div className="space-y-6">
+    <Card className="bg-white/5 backdrop-blur-3xl border-white/10 text-white shadow-[0_8px_32px_0_rgba(0,0,0,0.36)] relative overflow-hidden group p-1">
+      {/* Liquid glass light reflection */}
+      <div className="absolute -top-[50%] -left-[50%] w-[200%] h-[200%] bg-gradient-to-br from-white/10 via-transparent to-transparent rotate-12 pointer-events-none" />
+
+      <div className="space-y-6 relative z-10">
         <div className="space-y-2 text-center">
-          <h1 className="text-2xl font-bold">Create Account</h1>
-          <p className="text-zinc-400">Join our rebate portal today</p>
+          <h1 className="text-3xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-b from-white to-white/60">Create Account</h1>
+          <p className="text-gray-400 font-medium">Join our rebate portal today</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && (
-            <div className="bg-red-500/10 border border-red-500 text-red-500 p-3 rounded-md text-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="bg-red-500/10 border border-red-500/20 text-red-400 p-4 rounded-xl text-sm backdrop-blur-md"
+            >
               {error}
-            </div>
+            </motion.div>
           )}
           {success && (
-            <div className="bg-green-500/10 border border-green-500 text-green-500 p-3 rounded-md text-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="bg-green-500/10 border border-green-500/20 text-green-400 p-4 rounded-xl text-sm backdrop-blur-md"
+            >
               {success}
-            </div>
+            </motion.div>
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
+            <Label htmlFor="name" className="text-gray-300 ml-1">Name</Label>
             <Input
               id="name"
               name="name"
               placeholder="John Doe"
               required
               disabled={isLoading}
-              className="bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-500 focus:border-zinc-700 focus:ring-zinc-700"
+              className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-design-pink/50 focus:ring-design-pink/20 h-11 rounded-xl transition-all duration-300"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email" className="text-gray-300 ml-1">Email</Label>
             <Input
               id="email"
               name="email"
@@ -102,46 +114,53 @@ export default function SignupPage() {
               placeholder="name@example.com"
               required
               disabled={isLoading}
-              className="bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-500 focus:border-zinc-700 focus:ring-zinc-700"
+              className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-design-pink/50 focus:ring-design-pink/20 h-11 rounded-xl transition-all duration-300"
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              name="password"
-              type="password"
-              required
-              disabled={isLoading}
-              className="bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-500 focus:border-zinc-700 focus:ring-zinc-700"
-            />
-          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="password" title="password" className="text-gray-300 ml-1">Password</Label>
+              <Input
+                id="password"
+                name="password"
+                type="password"
+                required
+                disabled={isLoading}
+                className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-design-pink/50 focus:ring-design-pink/20 h-11 rounded-xl transition-all duration-300"
+              />
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirm Password</Label>
-            <Input
-              id="confirmPassword"
-              name="confirmPassword"
-              type="password"
-              required
-              disabled={isLoading}
-              className="bg-zinc-900 border-zinc-800 text-white placeholder:text-zinc-500 focus:border-zinc-700 focus:ring-zinc-700"
-            />
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword" title="password" className="text-gray-300 ml-1">Confirm</Label>
+              <Input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                required
+                disabled={isLoading}
+                className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-design-pink/50 focus:ring-design-pink/20 h-11 rounded-xl transition-all duration-300"
+              />
+            </div>
           </div>
 
           <Button
             type="submit"
-            className="w-full bg-gradient-to-r from-design-pink to-design-purple text-white hover:opacity-90 mt-4 border-none"
+            variant="primary"
+            size="lg"
+            className="w-full bg-gradient-to-r from-design-pink to-design-purple text-white mt-6 shadow-lg shadow-design-pink/20 relative group overflow-hidden border-none"
             disabled={isLoading}
             isLoading={isLoading}
           >
-            Sign Up
+            <span className="relative z-10">Sign Up</span>
+            <motion.div
+              className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500 ease-out"
+            />
           </Button>
 
-          <div className="text-sm text-zinc-400 text-center mt-4">
+          <div className="text-sm text-gray-400 text-center mt-6">
             Already have an account?{" "}
-            <Link href="/login" className="text-white hover:underline">
+            <Link href="/login" className="text-design-pink font-semibold hover:text-design-pink/80 transition-colors">
               Log in
             </Link>
           </div>

@@ -74,7 +74,7 @@ export function BackupCodes({ initialCodes = [] }: BackupCodesProps) {
             ))}
           </div>
           <div className="flex gap-2">
-            <Button onClick={handleDownload} variant="default">
+            <Button onClick={handleDownload} variant="primary">
               Download Codes
             </Button>
             <Button onClick={handleGenerate} variant="outline" disabled={loading}>

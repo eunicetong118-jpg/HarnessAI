@@ -27,7 +27,6 @@ export async function POST(req: Request) {
       where: { id: userId },
       data: {
         isEmailVerified: true,
-        emailVerified: new Date(),
       },
     });
 

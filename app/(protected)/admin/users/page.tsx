@@ -11,7 +11,6 @@ export default async function UsersPage() {
     ...user,
     createdAt: user.createdAt.toISOString(),
     lastModifiedAt: user.lastModifiedAt.toISOString(),
-    emailVerified: user.emailVerified?.toISOString() || null,
     lastLoginAttemptAt: user.lastLoginAttemptAt?.toISOString() || null,
     lastSuccessfulLoginAt: user.lastSuccessfulLoginAt?.toISOString() || null,
   }));

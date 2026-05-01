@@ -12,7 +12,7 @@ export async function PATCH(
   }
 
   const { id } = await params;
-  const adminId = session.user.id;
+  const adminId = (session?.user as any)?.id;
 
   try {
     const ticket = await claimTicket(id, adminId!);

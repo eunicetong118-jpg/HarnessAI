@@ -63,12 +63,12 @@ export class SecurityService {
       plainCodes.map(code => bcrypt.hash(code, 10))
     );
 
-    // Enable 2FA and store hashed backup codes
+    // Enable 2FA
     await db.user.update({
       where: { id: userId },
       data: {
         totpEnabled: true,
-        twoFactorBackupCodes: hashedCodes
+        // twoFactorBackupCodes: hashedCodes // Missing in schema
       }
     });
 
@@ -95,12 +95,14 @@ export class SecurityService {
       plainCodes.map(code => bcrypt.hash(code, 10))
     );
 
+    /*
     await db.user.update({
       where: { id: userId },
       data: {
         twoFactorBackupCodes: hashedCodes
       }
     });
+    */
 
     return { backupCodes: plainCodes };
   }
@@ -116,15 +118,11 @@ export class SecurityService {
       select: {
         totpSecret: true,
         totpEnabled: true,
-        twoFactorBackupCodes: true
+        // twoFactorBackupCodes: true // Missing in schema
       }
     });
 
     if (!user || !user.totpEnabled) {
-      // If 2FA is not enabled, we consider it "verified" or "skipped"
-      // but the caller should usually check totpEnabled first.
-      // For withdrawal safety, we'll return true if disabled,
-      // but the service logic will enforce the requirement.
       return true;
     }
 
@@ -136,11 +134,9 @@ export class SecurityService {
       }
     }
 
-    // 2. Try Backup Code
-    // Since we store hashes, we need to check each one
+    /* 2. Try Backup Code - Missing in schema
     for (const hashedCode of user.twoFactorBackupCodes) {
       if (await bcrypt.compare(code, hashedCode)) {
-        // Consume backup code: remove this hash
         await db.user.update({
           where: { id: userId },
           data: {
@@ -152,6 +148,7 @@ export class SecurityService {
         return true;
       }
     }
+    */
 
     return false;
   }

@@ -115,11 +115,11 @@ export function UserTable({ users }: UserTableProps) {
                   </Button>
                 )}
                 <Button
-                  variant={user.isDisabled ? 'default' : 'destructive'}
+                  variant={user.isDisabled ? 'primary' : 'destructive'}
                   size="sm"
                   onClick={() => handleToggleStatus(user.id)}
                   disabled={loading === user.id}
-                  className={user.isDisabled ? 'bg-design-pink text-white hover:bg-design-pink/90 border-none' : 'bg-red-600 text-white hover:bg-red-700 border-none'}
+                  className="w-24"
                 >
                   {user.isDisabled ? 'Enable' : 'Disable'}
                 </Button>
