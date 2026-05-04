@@ -7,7 +7,7 @@
 - [x] Connect services to Registration API.
 - [x] NextAuth v5 Configuration.
 - [x] Verify Email API endpoint.
-- [ ] Password Reset flow.
+- [x] AUTH-09: Password Reset flow.
 - [x] 2FA (TOTP) enrollment and verification.
 - [x] AUTH-07: Login Page implementation with credentials support and error handling.
 - [x] AUTH-08: Signup Page implementation with registration API integration and validation.
@@ -48,6 +48,7 @@
 | AUTH-05 (Registration API) | Phase 1 | Completed |
 | AUTH-07 (Login UI) | Phase 6 | Completed |
 | AUTH-08 (Signup UI) | Phase 6 | Completed |
+| AUTH-09 (Password Reset) | Phase 7 | In Progress |
 | DASH-01 (Recharts Layout) | Phase 2 | Completed |
 | DASH-02 (Ledger Cards) | Phase 2 | Completed |
 | DASH-03 (Pending Banner) | Phase 2 | Completed |
