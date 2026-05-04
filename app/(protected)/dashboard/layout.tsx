@@ -26,17 +26,18 @@ export default async function DashboardLayout({
   }
 
   const hasPending = accounts.some(acc => acc.status === 'PENDING');
+  const status = hasPending ? 'PENDING' : 'VERIFIED';
 
   return (
     <div className="flex h-screen bg-design-bg relative overflow-hidden">
       <DesignBackground />
 
-      <Sidebar />
+      <Sidebar status={status} />
       <div className="flex flex-col flex-1 overflow-hidden relative z-10">
         <header className="flex items-center justify-between px-6 py-4 bg-design-surface/80 backdrop-blur-md border-b border-white/5 shadow-sm">
           <div className="flex items-center gap-4">
             <h1 className="text-xl font-bold text-white tracking-tight">User Portal</h1>
-            <StatusBadge status={hasPending ? 'PENDING' : 'VERIFIED'} />
+            <StatusBadge status={status} />
           </div>
           <div className="flex items-center">
             <div className="text-right mr-4 hidden sm:block">

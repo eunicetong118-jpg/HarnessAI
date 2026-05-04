@@ -15,11 +15,14 @@ const navigation = [
   { name: 'Settings', href: '/dashboard/settings', icon: Settings },
 ];
 
-export const Sidebar = () => {
+interface SidebarProps {
+  status?: 'PENDING' | 'VERIFIED';
+}
+
+export const Sidebar = ({ status = 'PENDING' }: SidebarProps) => {
   const pathname = usePathname();
   const { data: session } = useSession();
   const isAdmin = (session?.user as any)?.role === 'ADMIN';
-  const status = (session?.user as any)?.status || 'PENDING';
 
   return (
     <aside className="w-64 bg-design-surface/40 backdrop-blur-2xl border-r border-white/10 hidden md:flex flex-col relative z-20">
