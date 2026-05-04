@@ -48,7 +48,7 @@
 | AUTH-05 (Registration API) | Phase 1 | Completed |
 | AUTH-07 (Login UI) | Phase 6 | Completed |
 | AUTH-08 (Signup UI) | Phase 6 | Completed |
-| AUTH-09 (Password Reset) | Phase 7 | In Progress |
+| AUTH-09 (Password Reset) | Phase 7 | Completed |
 | DASH-01 (Recharts Layout) | Phase 2 | Completed |
 | DASH-02 (Ledger Cards) | Phase 2 | Completed |
 | DASH-03 (Pending Banner) | Phase 2 | Completed |
