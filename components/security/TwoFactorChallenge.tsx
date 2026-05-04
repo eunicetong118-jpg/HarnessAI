@@ -38,15 +38,15 @@ export function TwoFactorChallenge({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="text-center">
-        <h3 className="text-lg font-medium text-gray-900">Security Verification</h3>
-        <p className="text-sm text-gray-500">
-          Enter your 6-digit TOTP code or 8-character backup code to continue.
+        <h3 className="text-xl font-bold text-white tracking-tight">Security Verification</h3>
+        <p className="text-sm text-gray-400 mt-2">
+          Enter code from app or backup.
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-6">
         <div>
           <label htmlFor="securityCode" className="sr-only">
             Security Code
@@ -58,24 +58,24 @@ export function TwoFactorChallenge({
             name="securityCode"
             autoComplete="one-time-code"
             required
-            className="block w-full text-center text-2xl tracking-[0.5em] font-mono border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-2xl"
+            className="block w-full bg-white/5 text-center text-3xl tracking-[0.5em] font-mono text-white border border-white/10 rounded-2xl focus:ring-2 focus:ring-design-pink focus:border-transparent outline-none transition-all py-4 placeholder:text-white/5"
             placeholder="000000"
             value={code}
             onChange={handleInputChange}
             disabled={isLoading}
           />
           {error && (
-            <p className="mt-2 text-sm text-red-600 text-center" id="security-code-error">
+            <p className="mt-4 text-sm text-red-400 text-center bg-red-400/10 p-2 rounded-lg border border-red-400/20" id="security-code-error">
               {error}
             </p>
           )}
         </div>
 
-        <div className="flex flex-col space-y-2">
+        <div className="flex flex-col space-y-3">
           <button
             type="submit"
             disabled={isLoading || code.length < 6}
-            className="w-full inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+            className="w-full h-12 bg-gradient-to-r from-design-pink to-design-purple text-white font-bold rounded-xl shadow-lg shadow-design-pink/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
           >
             {isLoading ? 'Verifying...' : 'Verify & Submit'}
           </button>
@@ -83,7 +83,7 @@ export function TwoFactorChallenge({
             type="button"
             onClick={onCancel}
             disabled={isLoading}
-            className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+            className="w-full h-12 bg-white/5 text-gray-400 hover:text-white font-bold rounded-xl border border-white/10 hover:bg-white/10 transition-all"
           >
             Cancel
           </button>

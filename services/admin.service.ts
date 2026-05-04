@@ -71,7 +71,7 @@ export async function triggerManualResendVerification(userId: string, tx?: DB) {
 
   if (!user) throw new Error('User not found');
 
-  const performResend = async (client: DB) => {
+  const performCleanup = async (client: DB) => {
     // Invalidate old tokens
     await client.actionToken.deleteMany({
       where: {
@@ -79,17 +79,17 @@ export async function triggerManualResendVerification(userId: string, tx?: DB) {
         tokenType: 'EMAIL_VERIFICATION',
       },
     });
-
-    // Send new email (this creates a new token internally)
-    // Note: sendVerificationEmail would need to be updated to accept tx to be fully atomic
-    await sendVerificationEmail(user.id, user.email);
   };
 
   if (tx) {
-    await performResend(tx);
+    await performCleanup(tx);
   } else {
     await prisma.$transaction(async (pTx) => {
-      await performResend(pTx);
+      await performCleanup(pTx);
     });
   }
+
+  // Send new email (this creates a new token internally)
+  // Outside transaction to avoid timeout from SMTP network delay
+  await sendVerificationEmail(user.id, user.email);
 }

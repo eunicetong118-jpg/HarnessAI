@@ -32,3 +32,9 @@ body {
 ::-webkit-scrollbar-thumb {
   @apply bg-design-pink/20 rounded-full border-2 border-transparent bg-clip-content hover:bg-design-pink/40 transition-colors;
 }
+
+@layer components {
+  .glass-card {
+    @apply bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl;
+  }
+}

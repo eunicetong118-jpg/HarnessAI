@@ -15,7 +15,7 @@ export class AuthService {
     }
 
     const token = await createToken(user.id, 'PASSWORD_RESET');
-    const resetUrl = `${process.env.NEXTAUTH_URL}/auth/reset-password?token=${token}&uid=${user.id}`;
+    const resetUrl = `${process.env.NEXTAUTH_URL}/reset-password/${token}?userId=${user.id}`;
 
     await sendMail(
       email,

@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { AdminSidebar } from '@/components/admin/AdminSidebar';
+import { DesignBackground } from '@/components/shared/DesignBackground';
 
 export default async function AdminLayout({
   children,
@@ -19,12 +20,14 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="flex h-screen bg-design-bg">
+    <div className="flex h-screen bg-design-bg relative overflow-hidden">
+      <DesignBackground />
+
       <AdminSidebar />
-      <div className="flex flex-col flex-1 overflow-hidden">
-        <header className="flex items-center justify-between px-6 py-4 bg-design-surface border-b border-white/5 shadow-sm">
+      <div className="flex flex-col flex-1 overflow-hidden relative z-10">
+        <header className="flex items-center justify-between px-6 py-4 bg-design-surface/80 backdrop-blur-md border-b border-white/5 shadow-sm">
           <div className="flex items-center">
-            <h1 className="text-xl font-bold text-white">Admin Command Center</h1>
+            <h1 className="text-xl font-bold text-white tracking-tight">Admin Command Center</h1>
             <span className="ml-4 px-2 py-1 text-xs font-semibold text-design-pink bg-design-pink/10 rounded-full uppercase tracking-wider">
               Staff Access
             </span>
@@ -39,7 +42,7 @@ export default async function AdminLayout({
             </div>
           </div>
         </header>
-        <main className="flex-1 overflow-y-auto p-8 bg-design-bg">
+        <main className="flex-1 overflow-y-auto p-8">
           {children}
         </main>
       </div>

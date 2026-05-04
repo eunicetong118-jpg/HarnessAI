@@ -3,7 +3,9 @@ import { auth } from '@/lib/auth';
 import { hasLinkedAccount, getBrokerAccounts } from '@/services/broker.service';
 import { Sidebar } from '@/components/dashboard/Sidebar';
 import { PendingBanner } from '@/components/dashboard/pending-banner';
+import { StatusBadge } from '@/components/dashboard/StatusBadge';
 import { PageTransition } from '@/components/dashboard/PageTransition';
+import { DesignBackground } from '@/components/shared/DesignBackground';
 
 export default async function DashboardLayout({
   children,
@@ -26,11 +28,16 @@ export default async function DashboardLayout({
   const hasPending = accounts.some(acc => acc.status === 'PENDING');
 
   return (
-    <div className="flex h-screen bg-design-bg">
+    <div className="flex h-screen bg-design-bg relative overflow-hidden">
+      <DesignBackground />
+
       <Sidebar />
-      <div className="flex flex-col flex-1 overflow-hidden">
-        <header className="flex items-center justify-between px-6 py-4 bg-design-surface border-b border-white/5 shadow-sm">
-          <h1 className="text-xl font-bold text-white">User Portal</h1>
+      <div className="flex flex-col flex-1 overflow-hidden relative z-10">
+        <header className="flex items-center justify-between px-6 py-4 bg-design-surface/80 backdrop-blur-md border-b border-white/5 shadow-sm">
+          <div className="flex items-center gap-4">
+            <h1 className="text-xl font-bold text-white tracking-tight">User Portal</h1>
+            <StatusBadge status={hasPending ? 'PENDING' : 'VERIFIED'} />
+          </div>
           <div className="flex items-center">
             <div className="text-right mr-4 hidden sm:block">
               <p className="text-sm font-semibold text-white">{session.user.name}</p>
@@ -41,7 +48,7 @@ export default async function DashboardLayout({
             </div>
           </div>
         </header>
-        <main className="flex-1 overflow-y-auto p-8 bg-design-bg">
+        <main className="flex-1 overflow-y-auto p-8">
           <PageTransition>
             {hasPending && <PendingBanner />}
             {children}

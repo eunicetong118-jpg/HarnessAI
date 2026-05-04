@@ -43,6 +43,21 @@ const CountUp = ({ value, duration = 1.5 }: { value: bigint | number, duration?:
   }).format(count)}</span>;
 };
 
+const container = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
+const item = {
+  hidden: { opacity: 0, y: 20 },
+  show: { opacity: 1, y: 0 }
+};
+
 export const StatsCards = ({ totalEarned, available, pending }: StatsCardsProps) => {
   const stats = [
     {
@@ -50,38 +65,26 @@ export const StatsCards = ({ totalEarned, available, pending }: StatsCardsProps)
       value: totalEarned,
       icon: TrendingUp,
       color: 'text-design-pink',
-      bgColor: 'bg-design-pink/10',
+      glowColor: 'bg-design-pink/20',
+      border: 'border-design-pink/20',
     },
     {
-      label: 'Available Balance',
+      label: 'Available',
       value: available,
       icon: Wallet,
       color: 'text-design-purple',
-      bgColor: 'bg-design-purple/10',
+      glowColor: 'bg-design-purple/20',
+      border: 'border-design-purple/20',
     },
     {
-      label: 'Pending Rebates',
+      label: 'Pending',
       value: pending,
       icon: Clock,
-      color: 'text-gray-400',
-      bgColor: 'bg-white/5',
+      color: 'text-blue-400',
+      glowColor: 'bg-blue-400/20',
+      border: 'border-blue-400/20',
     },
   ];
-
-  const container = {
-    hidden: { opacity: 0 },
-    show: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  };
-
-  const item = {
-    hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100 } },
-  };
 
   return (
     <motion.div
@@ -92,23 +95,27 @@ export const StatsCards = ({ totalEarned, available, pending }: StatsCardsProps)
     >
       {stats.map((stat) => (
         <motion.div key={stat.label} variants={item}>
-          <Card className="p-6 bg-design-surface border-white/5 hover:border-white/10 transition-colors">
-            <div className="flex items-center">
-              <div className={`p-4 rounded-xl ${stat.bgColor}`}>
-                <stat.icon className={`h-6 w-6 ${stat.color}`} aria-hidden="true" />
+          <div className={`relative group cursor-pointer h-full`}>
+            {/* Outer Glow */}
+            <div className={`absolute -inset-0.5 ${stat.glowColor} opacity-0 group-hover:opacity-100 blur-xl transition-all duration-500 rounded-3xl`} />
+
+            <Card className={`relative h-full p-6 bg-white/5 backdrop-blur-3xl border ${stat.border} rounded-3xl overflow-hidden`}>
+              <div className="flex items-center">
+                <div className={`p-3 rounded-2xl ${stat.glowColor} border ${stat.border}`}>
+                  <stat.icon className={`h-6 w-6 ${stat.color} drop-shadow-[0_0_8px_rgba(255,255,255,0.3)]`} aria-hidden="true" />
+                </div>
+                <div className="ml-5 w-0 flex-1">
+                  <p className="text-[10px] font-bold text-gray-500 truncate tracking-[0.2em] uppercase leading-none mb-1">{stat.label}</p>
+                  <div className="text-3xl font-black text-white tracking-tighter">
+                    <CountUp value={stat.value} />
+                  </div>
+                </div>
               </div>
-              <div className="ml-5 w-0 flex-1">
-                <dl>
-                  <dt className="text-sm font-medium text-gray-400 truncate tracking-wide uppercase">{stat.label}</dt>
-                  <dd>
-                    <div className="text-2xl font-bold text-white mt-1">
-                      <CountUp value={stat.value} />
-                    </div>
-                  </dd>
-                </dl>
-              </div>
-            </div>
-          </Card>
+
+              {/* Decorative line */}
+              <div className={`absolute bottom-0 left-0 h-1 bg-gradient-to-r from-transparent via-white/20 to-transparent w-full opacity-0 group-hover:opacity-100 transition-opacity`} />
+            </Card>
+          </div>
         </motion.div>
       ))}
     </motion.div>

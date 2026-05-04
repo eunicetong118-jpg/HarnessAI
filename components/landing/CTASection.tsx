@@ -1,7 +1,27 @@
 import React from 'react';
 import Link from 'next/link';
 
-const CTASection = () => {
+const CTASection = ({ compact = false }: { compact?: boolean }) => {
+  if (compact) {
+    return (
+      <div className="glass-card p-6 rounded-2xl border border-design-pink/20 bg-gradient-to-br from-design-pink/5 to-design-purple/5">
+        <h2 className="text-xl font-bold text-white mb-2">
+          Ready to save?
+        </h2>
+        <p className="text-gray-400 text-xs mb-4">
+          Join 50k+ traders. Reduce costs.
+        </p>
+
+        <Link
+          href="/signup"
+          className="block text-center bg-gradient-to-r from-design-pink to-design-purple text-white px-4 py-3 rounded-xl font-bold text-sm hover:scale-[1.02] transition-all"
+        >
+          Create Free Account
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div className="text-center mt-24 mb-12 bg-gradient-to-b from-transparent to-design-surface/50 p-12 rounded-3xl border border-white/5">
       <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">

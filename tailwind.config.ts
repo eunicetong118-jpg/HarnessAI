@@ -14,6 +14,8 @@ const config: Config = {
         'design-card': '#1e183d',
         'design-pink': '#ec4899', // pink-500
         'design-purple': '#9333ea', // purple-600
+        'design-charcoal': '#0A0A0A',
+        'design-lime': '#ADFF00',
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",

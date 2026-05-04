@@ -50,14 +50,14 @@ export function TwoFactorEnrollment() {
 
   return (
     <div className="space-y-6">
-      <div className="p-6 bg-white rounded-lg shadow-sm border border-slate-200">
-        <h3 className="text-lg font-semibold mb-2">Two-Factor Authentication (TOTP)</h3>
-        <p className="text-sm text-slate-600 mb-6">
+      <div className="p-6 bg-design-surface rounded-xl border border-white/10">
+        <h3 className="text-lg font-semibold mb-2 text-white">Two-Factor Authentication (TOTP)</h3>
+        <p className="text-sm text-gray-400 mb-6">
           Enhance your account security by requiring a code from your authenticator app.
         </p>
 
         {error && (
-          <div className="p-3 mb-4 text-sm text-red-600 bg-red-50 border border-red-200 rounded">
+          <div className="p-3 mb-4 text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg">
             {error}
           </div>
         )}
@@ -66,7 +66,7 @@ export function TwoFactorEnrollment() {
           <button
             onClick={handleStartEnroll}
             disabled={loading}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+            className="px-4 py-2 bg-design-pink text-white rounded-lg hover:bg-design-pink/90 disabled:opacity-50 transition-colors"
           >
             {loading ? 'Starting...' : 'Enable 2FA'}
           </button>
@@ -74,17 +74,17 @@ export function TwoFactorEnrollment() {
 
         {step === 'qr' && (
           <div className="space-y-4">
-            <p className="text-sm">
+            <p className="text-sm text-gray-300">
               Scan this QR code with your authenticator app (Google Authenticator, Authy, etc.)
             </p>
             {qrDataUrl && (
-              <div className="flex justify-center p-4 bg-slate-50 rounded border border-slate-100">
+              <div className="flex justify-center p-4 bg-white rounded-lg border border-white/5 shadow-inner">
                 <Image src={qrDataUrl} alt="2FA QR Code" width={200} height={200} />
               </div>
             )}
             <button
               onClick={() => setStep('verify')}
-              className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+              className="w-full px-4 py-2 bg-design-pink text-white rounded-lg hover:bg-design-pink/90 transition-colors"
             >
               I have scanned it
             </button>
@@ -93,26 +93,26 @@ export function TwoFactorEnrollment() {
 
         {step === 'verify' && (
           <div className="space-y-4">
-            <p className="text-sm">Enter the 6-digit code from your app:</p>
+            <p className="text-sm text-gray-300">Enter the 6-digit code from your app:</p>
             <input
               type="text"
               value={token}
               onChange={(e) => setToken(e.target.value)}
               placeholder="000000"
-              className="w-full p-2 border border-slate-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full p-2 bg-design-card border border-white/10 rounded-lg text-white focus:ring-2 focus:ring-design-pink/50 focus:border-transparent outline-none"
               maxLength={6}
             />
             <div className="flex gap-2">
               <button
                 onClick={handleVerify}
                 disabled={loading || token.length !== 6}
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+                className="flex-1 px-4 py-2 bg-design-pink text-white rounded-lg hover:bg-design-pink/90 disabled:opacity-50 transition-colors"
               >
                 {loading ? 'Verifying...' : 'Verify & Enable'}
               </button>
               <button
                 onClick={() => setStep('qr')}
-                className="px-4 py-2 border border-slate-300 rounded hover:bg-slate-50"
+                className="px-4 py-2 border border-white/10 rounded-lg text-gray-400 hover:bg-white/5 transition-colors"
               >
                 Back
               </button>
@@ -121,7 +121,7 @@ export function TwoFactorEnrollment() {
         )}
 
         {step === 'success' && (
-          <div className="p-4 bg-green-50 border border-green-200 rounded text-green-700">
+          <div className="p-4 bg-green-500/10 border border-green-500/20 rounded-lg text-green-400">
             <p className="font-semibold">2FA Enabled Successfully!</p>
             <p className="text-sm">Your account is now more secure.</p>
           </div>

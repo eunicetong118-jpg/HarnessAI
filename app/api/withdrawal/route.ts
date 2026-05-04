@@ -4,8 +4,8 @@ import { z } from 'zod';
 import { createWithdrawal } from '@/services/withdrawal.service';
 
 const withdrawalSchema = z.object({
-  amount: z.number().positive('Amount must be positive'),
-  securityCode: z.string().optional(),
+  amount: z.coerce.number().positive('Amount must be positive'),
+  securityCode: z.string().nullish(),
 });
 
 /**
@@ -47,7 +47,7 @@ export const POST = auth(async (req) => {
       if (error.message === 'INVALID_2FA_CODE') {
         return NextResponse.json({ error: 'Invalid security code', code: 'INVALID_2FA_CODE' }, { status: 403 });
       }
-      if (error.message === 'Insufficient balance' || error.message === 'Amount must be greater than zero') {
+      if (error.message === 'Insufficient funds' || error.message === 'Amount must be greater than zero') {
         return NextResponse.json({ error: error.message }, { status: 400 });
       }
     }
